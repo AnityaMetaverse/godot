@@ -124,6 +124,7 @@ opts.Add(EnumVariable("bits", "Target platform bits", "default", ("default", "32
 opts.Add(EnumVariable("optimize", "Optimization type", "speed", ("speed", "size", "none")))
 opts.Add(BoolVariable("production", "Set defaults to build Godot for use in production", False))
 opts.Add(BoolVariable("use_lto", "Use link-time optimization", False))
+opts.Add(BoolVariable("use_stream", "Include or not FFMPEG", True))
 
 # Components
 opts.Add(BoolVariable("deprecated", "Enable deprecated features", True))
