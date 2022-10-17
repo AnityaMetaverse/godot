@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+import os
+import platform
+
+Import('env')
+Import('env_modules')
+
+env_agora = env_modules.Clone()
+env_agora.Append(CPPPATH=['#modules/anitya'])
+env_agora.add_source_files(env.modules_sources, "*.cpp")
+	
+if env['platform'] == "windows":
+	env_agora.Append(CPPPATH=['windows/64/include'])
+	env.Append(LIBPATH=['#modules/agora/windows/64/libs'])
+	env.Append(LINKFLAGS=['agora_rtc_sdk.dll.lib'])
+

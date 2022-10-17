@@ -5,7 +5,7 @@
 extern "C" {
 	#include "libavutil/frame.h"
 }
-#include <pthread.h>
+#include "anitya_thread.h"
 
 typedef struct FrameBuffer {
     AVFrame *frame;

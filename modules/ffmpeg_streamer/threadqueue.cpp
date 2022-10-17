@@ -16,7 +16,7 @@ int queue_is_empty(QueueContext *queue) {
 }
 
 void queue_clean(QueueContext *queue) {
-  pthread_t item = NULL_THREAD;
+  pthread_t_pt item = NULL_THREAD;
   do {
     item = queue_pop_front(queue);
     if (item == NULL_THREAD)
@@ -24,17 +24,17 @@ void queue_clean(QueueContext *queue) {
   } while (1);
 }
 
-pthread_t queue_peek_front(QueueContext *queue) {
+pthread_t_pt queue_peek_front(QueueContext *queue) {
   if (queue->first) {
     return queue->first->thread_id;
   }
   return NULL_THREAD;
 }
 
-pthread_t queue_pop_front(QueueContext *queue) {
+pthread_t_pt queue_pop_front(QueueContext *queue) {
   if (queue->first) {
     Item *first_item = queue->first;
-    pthread_t item = first_item->thread_id;
+    pthread_t_pt item = first_item->thread_id;
     queue->first = first_item->next_item;
     if (first_item->next_item == NULL) {
       queue->last = first_item->next_item;
@@ -46,7 +46,7 @@ pthread_t queue_pop_front(QueueContext *queue) {
   return NULL_THREAD;
 }
 
-void queue_push(QueueContext *queue, pthread_t item) {
+void queue_push(QueueContext *queue, pthread_t_pt item) {
   Item *first_item = (Item *) calloc(1, sizeof(Item));
   first_item->next_item = NULL;
   first_item->thread_id = item;

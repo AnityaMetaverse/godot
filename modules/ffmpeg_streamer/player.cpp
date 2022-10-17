@@ -105,10 +105,10 @@ void player_stop_all_threads() {
     if (queue_is_empty(thread_queue) == 1) {
       break;
     }
-    pthread_t thread = queue_pop_front(thread_queue);
+    pthread_t_pt thread = queue_pop_front(thread_queue);
     if (thread != NULL_THREAD) {
       logging("start join on thread");
-      int res = pthread_join(thread, NULL);
+      int res = pthread_join(*thread, NULL);
       logging("thread exit with code=%d", res);
     } else {
       break;
@@ -156,7 +156,7 @@ MediaPlayerContext *player_create(const char *url, uint8_t convert_to_rgb) {
   } else {
     if (thread_queue == NULL)
       thread_queue = queue_create();
-    queue_push(thread_queue, thread_id);
+    queue_push(thread_queue, &thread_id);
   }
   return vpc;
 }

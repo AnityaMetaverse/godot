@@ -7,11 +7,17 @@ Import("env_modules")
 
 env_ffmpeg = env_modules.Clone()
 
-env_ffmpeg.Append(CPPPATH=["include"])
+# env_ffmpeg.Append(CPPPATH=["include"])
+env_ffmpeg.Append(CPPPATH=[os.environ.get("FFMPEG_INCLUDE", "")])
 env.Append(LIBPATH=[os.environ.get("FFMPEG_LIBPATH", "")])
 
-LIBS = env.get("LIBS", "")
+# LIBS = env.get("LIBS", "")
 env.Append(LIBS=["avdevice", "avformat", "avcodec", "avutil", "avfilter", "swresample", "swscale"])
+
+if env['platform'] == "windows":
+    env_ffmpeg.Append(CPPPATH=['#modules/ffmpeg_streamer/pthread_windows/include'])
+    env.Append(LIBPATH=['#modules/ffmpeg_streamer/pthread_windows/bin'])
+    env.Append(LIBS=['pthread'])
 
 module_obj = []
 env_ffmpeg.add_source_files(module_obj, "*.cpp")

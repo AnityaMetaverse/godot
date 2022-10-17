@@ -11,7 +11,7 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
-#include <pthread.h>
+#include "anitya_thread.h"
 
 typedef struct DecoderContext {
     // AVFormatContext holds the header information from the format (Container)

@@ -1,0 +1,8 @@
+Package: pthreads
+Version: 3.0.0
+Port-Version: 11
+Architecture: x64-windows
+Multi-Arch: same
+Abi: fcf1fd4d4036381114e20a6779e7941db1755af39766d2eeb2c2490e195e32c4
+Description: Meta-package that provides PThreads4W on Windows, or assumes presence of system pthreads on POSIX systems.
+Type: Port

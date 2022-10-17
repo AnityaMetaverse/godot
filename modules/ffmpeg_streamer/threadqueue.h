@@ -2,12 +2,13 @@
 #define H_THREADQUEUE
 
 #include <stdlib.h>
-#include <pthread.h>
+#include "anitya_thread.h"
+typedef pthread_t* pthread_t_pt;
 
-#define NULL_THREAD ((pthread_t) 0)
+#define NULL_THREAD ((pthread_t_pt) 0)
 
 typedef struct Item {
-    pthread_t thread_id;
+    pthread_t_pt thread_id;
     struct Item *next_item;
 } Item;
 
@@ -23,11 +24,11 @@ int queue_is_full(QueueContext *queue);
 
 int queue_is_empty(QueueContext *queue);
 
-pthread_t queue_pop_front(QueueContext *queue);
+pthread_t_pt queue_pop_front(QueueContext *queue);
 
-pthread_t queue_peek_front(QueueContext *queue);
+pthread_t_pt queue_peek_front(QueueContext *queue);
 
-void queue_push(QueueContext *queue, pthread_t thread_id);
+void queue_push(QueueContext *queue, pthread_t_pt thread_id);
 
 void queue_clean(QueueContext *queue);
 
