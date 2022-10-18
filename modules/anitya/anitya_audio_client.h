@@ -5,6 +5,28 @@
 
 #include <unordered_map>
 
+
+class AudioClientUpdatePosition: public Reference
+{
+    GDCLASS(AudioClientUpdatePosition, Reference);
+    private:
+        Vector3 origin;
+        PoolStringArray names;
+        PoolVector3Array targets;
+
+    protected:
+        static void _bind_methods();
+
+    public:
+        Vector3 get_origin() const { return origin; }
+        void set_origin(const Vector3& p_origin) { origin = p_origin; }
+        PoolStringArray get_names() const { return names; }
+        void set_names(const PoolStringArray& p_names) { names = p_names; }
+        PoolVector3Array get_targets() const { return targets; }
+        void set_targets(const PoolVector3Array& p_targets) { targets = p_targets; }
+
+};
+
 class JoinChannelParameter: public Reference 
 {
     GDCLASS(JoinChannelParameter, Reference)
@@ -66,9 +88,9 @@ class AudioClient: public Node
         virtual void init(Ref<AudioClientConfig> p_config) { config = p_config; }
         Ref<AudioClientConfig> get_config() { return config; }
         virtual void join_channel(Ref<JoinChannelParameter> param) {}
-        virtual void upadte_position(const Vector3& pos) {}
+        virtual void update_position(Ref<AudioClientUpdatePosition> value) {}
         virtual void set_self_mute(bool value) {}
-        virtual void set_mute_user(int user_id, bool value) {}
+        virtual void set_mute_user(const String& user_id, bool value) {}
         void send_voice(PoolVector2Array pcm);
         PoolByteArray get_voice() const { return voice; }
 };

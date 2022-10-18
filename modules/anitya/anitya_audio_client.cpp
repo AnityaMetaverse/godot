@@ -52,6 +52,20 @@ void JoinChannelParameter::_bind_methods()
      ADD_PROPERTY(PropertyInfo(Variant::STRING, "token"), "set_token", "get_token");
 }
 
+void AudioClientUpdatePosition::_bind_methods()
+{
+     ClassDB::bind_method(D_METHOD("set_origin", "origin"), &AudioClientUpdatePosition::set_origin);
+     ClassDB::bind_method(D_METHOD("get_origin"), &AudioClientUpdatePosition::get_origin);
+     ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "origin"), "set_origin", "get_origin");
+
+     ClassDB::bind_method(D_METHOD("set_targets", "targets"), &AudioClientUpdatePosition::set_targets);
+     ClassDB::bind_method(D_METHOD("get_targets"), &AudioClientUpdatePosition::get_targets);
+     ADD_PROPERTY(PropertyInfo(Variant::POOL_VECTOR3_ARRAY, "targets"), "set_targets", "get_targets");
+
+     ClassDB::bind_method(D_METHOD("set_names", "names"), &AudioClientUpdatePosition::set_names);
+     ClassDB::bind_method(D_METHOD("get_names"), &AudioClientUpdatePosition::get_names);
+     ADD_PROPERTY(PropertyInfo(Variant::POOL_STRING_ARRAY, "names"), "set_names", "get_names");
+}
 
 void RemoteAudioClient::_bind_methods()
 {
