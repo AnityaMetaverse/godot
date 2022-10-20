@@ -65,6 +65,7 @@ class AgoraClient : public AudioClient {
         AgoraRTCObserver packet_observer;
         const Vector3 up = Vector3(0, 1, 0);
         const Vector3 right = Vector3(1, 0, 0);
+        const Vector3 forward = Vector3(0, 0, -1);
 
 
         std::unordered_map<std::string, uid_t> username_uid;
@@ -86,6 +87,9 @@ class AgoraClient : public AudioClient {
         void set_username(const String& p_name) { username = p_name; }
         // void set_user_id(uid_t p_user_id) { user_id = p_user_id; }
         // void register_account();
+        void _no_set_int(int value) {}
+        void set_client_id(uid_t p_uid) { user_id = p_uid; }
+        uid_t get_client_id() const { return user_id; }
         virtual void set_self_mute(bool value) override;
         virtual void set_mute_user(const String& user_id, bool value) override;
         void on_client_data_received(uid_t uid, const char* data, size_t length);

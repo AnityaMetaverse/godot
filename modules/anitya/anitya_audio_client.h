@@ -11,20 +11,23 @@ class AudioClientUpdatePosition: public Reference
     GDCLASS(AudioClientUpdatePosition, Reference);
     private:
         Vector3 origin;
-        PoolStringArray names;
+        PoolStringArray ids;
         PoolVector3Array targets;
 
     protected:
         static void _bind_methods();
 
     public:
-        Vector3 get_origin() const { return origin; }
-        void set_origin(const Vector3& p_origin) { origin = p_origin; }
-        PoolStringArray get_names() const { return names; }
-        void set_names(const PoolStringArray& p_names) { names = p_names; }
-        PoolVector3Array get_targets() const { return targets; }
-        void set_targets(const PoolVector3Array& p_targets) { targets = p_targets; }
+        Vector3 _get_origin() const { return origin; }
+        void _set_origin(const Vector3& p_origin) { origin = p_origin; }
 
+        PoolVector<String> _get_ids() const { return ids; }
+        void _set_ids(const PoolVector<String>& p_ids) { ids = p_ids; }
+        void push_id(const String& p_id) { ids.append(p_id); }
+
+        PoolVector<Vector3> _get_targets() const { return targets; }
+        void _set_targets(const PoolVector<Vector3>& p_targets) { targets = p_targets; }
+        void push_target(const Vector3& p_t) { targets.append(p_t); }
 };
 
 class JoinChannelParameter: public Reference 

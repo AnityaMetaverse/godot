@@ -54,17 +54,21 @@ void JoinChannelParameter::_bind_methods()
 
 void AudioClientUpdatePosition::_bind_methods()
 {
-     ClassDB::bind_method(D_METHOD("set_origin", "origin"), &AudioClientUpdatePosition::set_origin);
-     ClassDB::bind_method(D_METHOD("get_origin"), &AudioClientUpdatePosition::get_origin);
-     ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "origin"), "set_origin", "get_origin");
+     ClassDB::bind_method(D_METHOD("_set_targets", "targets"), &AudioClientUpdatePosition::_set_targets);
+     ClassDB::bind_method(D_METHOD("_get_targets"), &AudioClientUpdatePosition::_get_targets);
+     ADD_PROPERTY(PropertyInfo(Variant::POOL_VECTOR3_ARRAY, "targets"), "_set_targets", "_get_targets");
+     ClassDB::bind_method(D_METHOD("push_target", "target"), &AudioClientUpdatePosition::push_target);
 
-     ClassDB::bind_method(D_METHOD("set_targets", "targets"), &AudioClientUpdatePosition::set_targets);
-     ClassDB::bind_method(D_METHOD("get_targets"), &AudioClientUpdatePosition::get_targets);
-     ADD_PROPERTY(PropertyInfo(Variant::POOL_VECTOR3_ARRAY, "targets"), "set_targets", "get_targets");
+     ClassDB::bind_method(D_METHOD("_set_ids", "ids"), &AudioClientUpdatePosition::_set_ids);
+     ClassDB::bind_method(D_METHOD("_get_ids"), &AudioClientUpdatePosition::_get_ids);
+     ADD_PROPERTY(PropertyInfo(Variant::POOL_STRING_ARRAY, "ids"), "_set_ids", "_get_ids");
+     ClassDB::bind_method(D_METHOD("push_id", "id"), &AudioClientUpdatePosition::push_id);
 
-     ClassDB::bind_method(D_METHOD("set_names", "names"), &AudioClientUpdatePosition::set_names);
-     ClassDB::bind_method(D_METHOD("get_names"), &AudioClientUpdatePosition::get_names);
-     ADD_PROPERTY(PropertyInfo(Variant::POOL_STRING_ARRAY, "names"), "set_names", "get_names");
+     ClassDB::bind_method(D_METHOD("_set_origin", "origin"), &AudioClientUpdatePosition::_set_origin);
+     ClassDB::bind_method(D_METHOD("_get_origin"), &AudioClientUpdatePosition::_get_origin);
+     ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "origin"), "_set_origin", "_get_origin");
+     
+
 }
 
 void RemoteAudioClient::_bind_methods()

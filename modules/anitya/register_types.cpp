@@ -5,6 +5,7 @@
 
 void register_anitya_types()
 {
+    ClassDB::register_class<AudioClientUpdatePosition>();
     ClassDB::register_class<JoinChannelParameter>();
     ClassDB::register_virtual_class<AudioClient>();
     ClassDB::register_class<AudioClientConfig>();
