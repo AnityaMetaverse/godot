@@ -8,7 +8,7 @@
 #include "IAgoraMediaEngine.h"
 #include "anitya_audio_client.h"
 
-using namespace std;
+// using namespace std;
 using namespace agora;
 using namespace agora::media;
 using namespace agora::rtc;
@@ -57,6 +57,7 @@ class AgoraClient : public AudioClient {
     private:
         String username;
         String app_id;
+        bool channel_joined = false;
         const int package_per_loop = 5;
         const int package_size = 1024;
         uid_t user_id;

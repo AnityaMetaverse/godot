@@ -67,6 +67,7 @@ void AgoraClient::join_channel(Ref<JoinChannelParameter> params)
 	std::string user(get_config()->get_username().utf8().ptr());
 
 	int ret = rtc_engine->joinChannelWithUserAccount(token.c_str(), channel.c_str(), user.c_str(), options);
+	channel_joined = ret == 0;
 	print_line(String("join channel return: ") + String(itos(ret)));
 }
 
@@ -79,6 +80,7 @@ void AgoraClient::leave_channel(){
         return;
     }
 	rtc_engine->leaveChannel();
+	channel_joined = false;
 }
 
 void AgoraClient::set_self_mute(bool value)
@@ -128,7 +130,7 @@ std::vector<uid_t> AgoraClient::get_users()
 
 void AgoraClient::update_position(Ref<AudioClientUpdatePosition> value)
 {
-	if (!rtc_engine) { return; }
+	if (!rtc_engine || !channel_joined) { return; }
 
 	PoolVector3Array targets = value->_get_targets();
 	PoolStringArray names = value->_get_ids();
@@ -137,7 +139,7 @@ void AgoraClient::update_position(Ref<AudioClientUpdatePosition> value)
 		String name = names[index];
 		agora::rtc::UserInfo ui;
 		std::string n(name.utf8().ptr());
-		print_line(String("Updating positions"));
+		// print_line(String("Updating positions"));
 		int res = rtc_engine->getUserInfoByUserAccount(n.c_str(), &ui);
 		if (res < 0)
 		{

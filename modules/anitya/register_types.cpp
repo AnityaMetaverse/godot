@@ -11,6 +11,7 @@ void register_anitya_types()
     ClassDB::register_class<AudioClientConfig>();
     ClassDB::register_virtual_class<RemoteAudioClient>();
     ClassDB::register_class<AudioClientConfig>();
+    ClassDB::register_class<RemoteAudioClient>();
 }
 
 void unregister_anitya_types()

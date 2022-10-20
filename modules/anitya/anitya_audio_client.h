@@ -4,6 +4,7 @@
 #include "scene/main/node.h"
 
 #include <unordered_map>
+#include <vector>
 
 
 class AudioClientUpdatePosition: public Reference
