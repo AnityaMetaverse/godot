@@ -11,7 +11,8 @@ class IHTTP: public Reference
     GDCLASS(IHTTP, Reference);
 
     public:
-        virtual void make_request(Ref<NetRequestData> p_data) {}
+        virtual bool make_request(Ref<NetRequestData> p_data) { return false; }
+        virtual void update() {}
     protected:
         static void _bind_methods();
 };

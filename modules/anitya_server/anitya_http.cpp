@@ -1,11 +1,41 @@
 #include "anitya_http.h"
 
-void AnityaHTTP::make_request(Ref<NetRequestData> p_data)
+bool AnityaHTTP::make_request(Ref<NetRequestData> p_data)
 {
+    request_mutex.lock();
+
     Ref<NetRequest> r = Ref<NetRequest>(memnew(NetRequest));
-    r->connect("request_finished", *(p_data->get_requester()), "_on_request_finished");
-    r->start(p_data);
+    r->connect("request_finished", p_data->get_requester(), "_on_request_finished");
+    if (!r->start(p_data))
+    {
+        request_mutex.unlock();
+        return false;
+    }
+
     requests.push_back(r);
+    request_mutex.unlock();
+    return true;
+
+}
+
+void AnityaHTTP::update()
+{
+    request_mutex.lock();
+    {
+        for (int index = 0; index < requests.size(); index++)
+        {
+            Ref<NetRequest> r = requests.get(index);
+            r->update();
+
+            if (r->is_done())
+            {
+                Ref<NetRequestResponse> response = r->get_response();
+                r->emit_signal("request_finished", response);
+                requests.remove(index);
+            }
+        }
+    }
+    request_mutex.unlock();
 }
 
 void AnityaHTTP::_bind_methods()

@@ -12,7 +12,7 @@
 
 void register_anitya_server_types()
 {
-    ClassDB::register_virtual_class<IHTTP>();
+    ClassDB::register_class<IHTTP>();
     ClassDB::register_class<AnityaHTTP>();
     ClassDB::register_class<NetRequest>();
     ClassDB::register_class<NetRequestResponse>();
