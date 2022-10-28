@@ -1,0 +1,20 @@
+#include "register_types.h"
+
+#include "core/class_db.h"
+#include "anitya_audio_client.h"
+
+void register_anitya_types()
+{
+    ClassDB::register_class<AudioClientUpdatePosition>();
+    ClassDB::register_class<JoinChannelParameter>();
+    ClassDB::register_virtual_class<AudioClient>();
+    ClassDB::register_class<AudioClientConfig>();
+    ClassDB::register_virtual_class<RemoteAudioClient>();
+    ClassDB::register_class<AudioClientConfig>();
+    ClassDB::register_class<RemoteAudioClient>();
+}
+
+void unregister_anitya_types()
+{
+
+}
