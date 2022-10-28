@@ -42,7 +42,15 @@ PoolByteArray ASPS::decode(const PoolByteArray& p_data)
         return result
     }
 
-    result.resize(p_data.size() + 3);
+    result.resize(p_data.size() - 3);
+
+    uint8_t* destiny = result.write().ptr();
+    uint8_t* origin = data + 3;
+
+    for (int index = 0; index < result.size(); index++)
+    {
+        *(destiny + index) = *(origin + index);
+    }
 
     return result;
 }
