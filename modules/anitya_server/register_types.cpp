@@ -2,6 +2,8 @@
 
 #include "core/class_db.h"
 
+#include "db.h"
+
 #include "job.h"
 #include "job_manager.h"
 #include "ticket.h"
@@ -12,6 +14,9 @@
 
 void register_anitya_server_types()
 {
+    ClassDB::register_class<LocalAssetData>();
+    ClassDB::register_class<IDB>();
+
     ClassDB::register_class<IHTTP>();
     ClassDB::register_class<AnityaHTTP>();
     ClassDB::register_class<NetRequest>();
