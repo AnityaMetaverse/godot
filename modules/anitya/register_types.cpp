@@ -3,9 +3,11 @@
 // #include "core/class_db.h"
 // #include "anitya_audio_client.h"
 #include "asps.h"
+#include "uuid.h"
 
 void register_anitya_types()
 {
+    ClassDB::register_class<UUID>();
     ClassDB::register_class<ASPS>();
 
     // ClassDB::register_class<AudioClientUpdatePosition>();
