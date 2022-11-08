@@ -19,10 +19,10 @@ String UUID::as_string()
 UUID::UUID()
 {
     const char* values = "0123456789abcdef";
-    int[5] sections = {8, 4, 4, 4, 16};
+    // int[5] sections = {8, 4, 4, 4, 16};
     uuid = String("00000000-0000-0000-0000-000000000000");
 
-    uuid.set(0, values[generator.randi() % 16]);
+    // uuid.set(0, values[generator.randi() % 16]);
 
 }
 

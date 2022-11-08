@@ -7,7 +7,7 @@
 
 void register_anitya_types()
 {
-    ClassDB::register_class<UUID>();
+    // ClassDB::register_class<UUID>();
     ClassDB::register_class<ASPS>();
 
     // ClassDB::register_class<AudioClientUpdatePosition>();
