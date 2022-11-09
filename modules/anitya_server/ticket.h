@@ -14,7 +14,8 @@ class Ticket: public Reference
         static void _bind_methods();
     
     public:
-        void _init(Ref<AJob> p_job);
+        // void _init(Ref<AJob> p_job);
+        void attach_job(Ref<AJob> p_job);
         String get_job_id() const { return job_id; }
 };
 

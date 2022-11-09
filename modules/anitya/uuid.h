@@ -16,7 +16,10 @@ class UUID: public Reference
     
     public:
         Ref<UUID> copy();
-        String as_string();
+        // String as_string();
+        // void use(const String& p_uuid_string) { uuid = p_uuid_string; }
+        void set_value(const String& p_uuid) { uuid = p_uuid; }
+        String get_value() const { return uuid; }
 
         UUID();
         ~UUID();

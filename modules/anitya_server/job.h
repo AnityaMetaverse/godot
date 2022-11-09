@@ -22,25 +22,30 @@ class JobResult: public Reference
         // void _init(bool p_succeed, const Dictionary& p_data);
 };
 
+class JobStatus: public Reference
+{
+    GDCLASS(JobStatus, Reference);
+};
+
 class AJob: public Reference
 {
     GDCLASS(AJob, Reference);
 
     public:
-        enum PRIORITY
+        enum Priority
         {
             JOB_PRIORITY_HIGH,
             JOB_PRIORITY_NORMAL,
             JOB_PRIORITY_LOW,
         };
 
-        enum SCOPE
+        enum Scope
         {
             JOB_SCOPE_LOCAL,
             JOB_SCOPE_REMOTE
         };
 
-        enum DUTY
+        enum Duty
         {
             JOB_DUTY_MUST,
             JOB_DUTY_MAYBE
@@ -52,6 +57,7 @@ class AJob: public Reference
         int priority;
         String job_id;
         Ref<JobResult> result;
+        Ref<JobStatus> status;
         bool _done = false;
 
     protected:
@@ -73,7 +79,12 @@ class AJob: public Reference
         virtual String get_job_id() const { return job_id; }
         virtual void start() {}
         virtual void update() {}
+        AJob();
+        ~AJob();
 };
 
+VARIANT_ENUM_CAST(AJob::Priority);
+VARIANT_ENUM_CAST(AJob::Scope);
+VARIANT_ENUM_CAST(AJob::Duty);
 
 #endif

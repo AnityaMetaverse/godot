@@ -53,7 +53,7 @@ bool NetRequest::start(Ref<NetRequestData> p_data)
 {
     _done = false;
     request_data = p_data;
-    print_line(String("Connecting to: ") + p_data->get_host() + itos(p_data->get_port()));
+    // print_line(String("Connecting to: ") + p_data->get_host() + itos(p_data->get_port()));
     int error = client.connect_to_host(p_data->get_host(), p_data->get_port());
     state = State::CONNECTING;
     return error == OK;
@@ -61,7 +61,7 @@ bool NetRequest::start(Ref<NetRequestData> p_data)
 
 void NetRequest::finish_request()
 {
-    print_line(String("Request finished...."));
+    // print_line(String("Request finished...."));
     _done = true;
     request_response = Ref<NetRequestResponse>(memnew(NetRequestResponse));
     request_response->set_error(client.get_response_code());

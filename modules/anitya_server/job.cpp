@@ -49,4 +49,26 @@ void AJob::_bind_methods()
     ADD_SIGNAL(MethodInfo("finished", PropertyInfo(Variant::OBJECT, "job"), PropertyInfo(Variant::OBJECT, "result")));
     // ADD_SIGNAL(MethodInfo("job_failed", PropertyInfo(Variant::OBJECT, "job")));
 
+    BIND_ENUM_CONSTANT(JOB_DUTY_MUST);
+    BIND_ENUM_CONSTANT(JOB_DUTY_MAYBE);
+
+    BIND_ENUM_CONSTANT(JOB_PRIORITY_HIGH);
+    BIND_ENUM_CONSTANT(JOB_PRIORITY_NORMAL);
+    BIND_ENUM_CONSTANT(JOB_PRIORITY_LOW);
+    
+    BIND_ENUM_CONSTANT(JOB_SCOPE_LOCAL);
+    BIND_ENUM_CONSTANT(JOB_SCOPE_REMOTE);
+
+
+}
+
+AJob::AJob(): result(memnew(JobResult)), status(memnew(JobStatus))
+{
+
+}
+
+AJob::~AJob()
+{
+    memdelete(result.ptr());
+    memdelete(status.ptr());
 }
