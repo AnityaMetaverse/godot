@@ -69,6 +69,13 @@ AJob::AJob(): result(memnew(JobResult)), status(memnew(JobStatus))
 
 AJob::~AJob()
 {
-    memdelete(result.ptr());
-    memdelete(status.ptr());
+    // if (!result.is_null())
+    // {
+    //     memdelete(result.ptr());
+    // }
+
+    // if (!status.is_null())
+    // {
+    //     memdelete(status.ptr());
+    // }
 }

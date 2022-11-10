@@ -16,11 +16,6 @@ void ComponentProperty::_bind_methods()
     ADD_PROPERTY(PropertyInfo(Variant::INT, "type"), "set_type", "get_type");
 }
 
-void BaseComponent::_bind_methods()
-{
-
-}
-
 void Component::_bind_methods()
 {
 

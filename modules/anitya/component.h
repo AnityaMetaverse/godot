@@ -28,25 +28,20 @@ class ComponentProperty: public Reference
         int get_type() const { return type; }
 };
 
-class BaseComponent: public Node
+class Component: public Node
 {
-    GDCLASS(BaseComponent, Node);
+    GDCLASS(Component, Node);
 
     private:
         Ref<UUID> uuid;
         String unique_name;
     protected:
         static void _bind_methods();
+    
+    public:
+        Component() {}
+        ~Component() {}
 };
 
-class Component: public BaseComponent
-{
-    GDCLASS(Component, BaseComponent);
-    private:
-        // Vector<BaseComponent*> components
-
-    protected:
-        static void _bind_methods();
-};
 
 #endif
