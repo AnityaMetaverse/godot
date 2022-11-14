@@ -62,7 +62,11 @@ void AJob::_bind_methods()
 
 }
 
-AJob::AJob(): result(memnew(JobResult)), status(memnew(JobStatus))
+AJob::AJob():   result(memnew(JobResult)),
+                status(memnew(JobStatus)),
+                duty(Duty::JOB_DUTY_MUST),
+                scope(Scope::JOB_SCOPE_REMOTE),
+                priority(Priority::JOB_PRIORITY_HIGH)
 {
 
 }

@@ -20,6 +20,7 @@ class UUID: public Reference
         // void use(const String& p_uuid_string) { uuid = p_uuid_string; }
         void set_value(const String& p_uuid) { uuid = p_uuid; }
         String get_value() const { return uuid; }
+        bool operator==(const Ref<UUID>& p_other);
 
         UUID();
         ~UUID();

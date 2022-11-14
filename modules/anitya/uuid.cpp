@@ -11,6 +11,11 @@ void UUID::_bind_methods()
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "value"), "set_value", "get_value");
 }
 
+bool UUID::operator==(const Ref<UUID>& p_other)
+{
+    return uuid == p_other->get_value();
+}
+
 UUID::UUID()
 {
     std::random_device              rd;
