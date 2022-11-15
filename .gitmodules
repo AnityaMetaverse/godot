@@ -1,3 +1,0 @@
-[submodule "modules/godot_sqlite"]
-	path = modules/godot_sqlite
-	url = https://github.com/godot-extended-libraries/godot-sqlite
