@@ -33,14 +33,14 @@ class ComponentProperty: public Reference
         int get_type() const { return type; }
 };
 
-class BaseComponent: public Node
+class Component: public Node
 {
-    GDCLASS(BaseComponent, Node);
+    GDCLASS(Component, Node);
 
     private:
         Ref<UUID> uuid;
         String component_name;
-        // Entity* entity;
+        Entity* entity;
         PoolStringArray expected_properties;
 
     protected:
@@ -52,7 +52,7 @@ class BaseComponent: public Node
         Ref<UUID> get_uuid() const { return uuid; }
 
         //HACK: It must be Enitty class.
-        virtual void set_entity(Node* p_entity) {}
+        void set_entity(Node* p_entity);
         // {
         //     Entity* e = Object::cast_to<Entity>(p_entity);
         //     if (e)
@@ -66,18 +66,19 @@ class BaseComponent: public Node
         // }
         // //HACK: IT MUST BE AN Entity
         // virtual Node* get_entity() const { return (Node*)entity; }
-        virtual Spatial* get_entity() const { return nullptr; }
-
+        Node* get_entity() const { return (Node*)entity; }
+        //HACK: It must be a Vector<ComponentProperty>
+        Vector<Variant> get_properties() { return Vector<Variant>(); }
         virtual void apply_property(const Ref<ComponentProperty>& p_property) {}
         void set_component_name(const String& p_name) { component_name = p_name; }
         String get_component_name() const { return component_name; }
-        virtual void destroy() {}
+        virtual void destroy() { queue_delete(); }
         void set_expected_properties(const PoolStringArray& p_expected_properties) { expected_properties = p_expected_properties; }
         PoolStringArray get_expected_properties() const { return expected_properties; }
 
         // virtual void _on_component_added(Node* p_component) {}
-        BaseComponent();
-        ~BaseComponent();
+        Component();
+        ~Component();
 };
 
 

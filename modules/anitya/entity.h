@@ -22,7 +22,7 @@ class Entity: public Spatial
     private:
         Ref<UUID> uuid;
         String entity_name;
-        Vector<BaseComponent*> components;
+        Vector<Component*> components;
         // enum 
     protected:
         static void _bind_methods();
@@ -43,10 +43,14 @@ class Entity: public Spatial
         //HACK: IT MUST BE Component
         void remove_component(Node* p_component);
 
+        //HACK: IT MUST BE Vector<Component>
+        Vector<Variant> get_components() const;
+
 
         // void dummy(DummyEntity* e) {}
 
         Node* find_component_by_uuid(const Ref<UUID>& p_uuid);
+        Node* find_component_by_name(const String& p_name);
     
         Entity();
         ~Entity();

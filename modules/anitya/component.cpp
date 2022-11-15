@@ -18,25 +18,40 @@ void ComponentProperty::_bind_methods()
     ADD_PROPERTY(PropertyInfo(Variant::INT, "type"), "set_type", "get_type");
 }
 
-void BaseComponent::_bind_methods()
+void Component::set_entity(Node* p_entity)
 {
-    ClassDB::bind_method(D_METHOD("start"), &BaseComponent::start);
-    ClassDB::bind_method(D_METHOD("apply_property"), &BaseComponent::apply_property);
-    ClassDB::bind_method(D_METHOD("destroy"), &BaseComponent::destroy);
+    Entity* e = Object::cast_to<Entity>(p_entity);
+    if (e)
+    {
+        entity = e; 
+    }
+    else
+    {
+        ERR_PRINT("p_entity doesn't inherit from Entity");
+    }
+}
 
-    ClassDB::bind_method(D_METHOD("set_entity", "entity"), &BaseComponent::set_entity);
-    ClassDB::bind_method(D_METHOD("get_entity"), &BaseComponent::get_entity);
+void Component::_bind_methods()
+{
+    ClassDB::bind_method(D_METHOD("start"), &Component::start);
+    ClassDB::bind_method(D_METHOD("apply_property"), &Component::apply_property);
+    ClassDB::bind_method(D_METHOD("destroy"), &Component::destroy);
 
-    ClassDB::bind_method(D_METHOD("set_uuid", "uuid"), &BaseComponent::set_uuid);
-    ClassDB::bind_method(D_METHOD("get_uuid"), &BaseComponent::get_uuid);
+    ClassDB::bind_method(D_METHOD("set_entity", "entity"), &Component::set_entity);
+    ClassDB::bind_method(D_METHOD("get_entity"), &Component::get_entity);
 
-    ClassDB::bind_method(D_METHOD("set_component_name", "BaseComponent_name"), &BaseComponent::set_component_name);
-    ClassDB::bind_method(D_METHOD("get_component_name"), &BaseComponent::get_component_name);
+    ClassDB::bind_method(D_METHOD("set_uuid", "uuid"), &Component::set_uuid);
+    ClassDB::bind_method(D_METHOD("get_uuid"), &Component::get_uuid);
 
-    ClassDB::bind_method(D_METHOD("set_expected_properties", "expected_properties"), &BaseComponent::set_expected_properties);
-    ClassDB::bind_method(D_METHOD("get_expected_properties"), &BaseComponent::get_expected_properties);
+    ClassDB::bind_method(D_METHOD("set_component_name", "component_name"), &Component::set_component_name);
+    ClassDB::bind_method(D_METHOD("get_component_name"), &Component::get_component_name);
+
+    ClassDB::bind_method(D_METHOD("set_expected_properties", "expected_properties"), &Component::set_expected_properties);
+    ClassDB::bind_method(D_METHOD("get_expected_properties"), &Component::get_expected_properties);
+    ClassDB::bind_method(D_METHOD("get_properties"), &Component::get_properties);
 
     // ClassDB::bind_method(D_METHOD("_on_component_added"), &Component::_on_component_added);
+
 
     // ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "entity"), "set_entity", "get_entity");
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "uuid"), "set_uuid", "get_uuid");
@@ -44,12 +59,12 @@ void BaseComponent::_bind_methods()
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "component_name"), "set_component_name", "get_component_name");
 }
 
-BaseComponent::BaseComponent(): uuid(memnew(UUID))
+Component::Component(): uuid(memnew(UUID))
 {
 
 }
 
-BaseComponent::~BaseComponent()
+Component::~Component()
 {
 
 }
