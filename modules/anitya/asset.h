@@ -7,7 +7,7 @@
 class IAsset
 {
     public:
-        virtual void use_data(const PoolByteArray& p_data) = 0;
+        virtual void set_stream(const PoolByteArray& p_stream) = 0;
 };
 
 #endif

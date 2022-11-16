@@ -11,11 +11,13 @@
 #include "http.h"
 #include "net_request.h"
 #include "anitya_http.h"
+#include "sqlite_db.h"
 
 void register_anitya_server_types()
 {
     ClassDB::register_class<LocalAssetData>();
     ClassDB::register_class<IDB>();
+    ClassDB::register_class<SQLiteDB>();
 
     ClassDB::register_class<IHTTP>();
     ClassDB::register_class<AnityaHTTP>();

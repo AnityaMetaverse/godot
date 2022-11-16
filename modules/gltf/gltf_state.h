@@ -49,10 +49,15 @@
 #include "gltf_skin.h"
 #include "gltf_texture.h"
 
+
+
 class GLTFState : public Resource {
 	GDCLASS(GLTFState, Resource);
 	friend class GLTFDocument;
 	friend class PackedSceneGLTF;
+
+	friend class GLTFDocumentStream;
+	friend class PackedSceneGLTFStream;
 
 	String filename;
 	Dictionary json;

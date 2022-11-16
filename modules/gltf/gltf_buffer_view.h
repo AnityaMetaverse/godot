@@ -38,6 +38,8 @@
 class GLTFBufferView : public Resource {
 	GDCLASS(GLTFBufferView, Resource);
 	friend class GLTFDocument;
+	friend class GLTFDocumentStream;
+
 
 private:
 	GLTFBufferIndex buffer = -1;

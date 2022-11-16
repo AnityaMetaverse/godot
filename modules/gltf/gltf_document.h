@@ -113,7 +113,7 @@ public:
 		COMPONENT_TYPE_FLOAT = 5126,
 	};
 
-private:
+protected:
 	template <class T>
 	static Array to_array(const Vector<T> &p_inp) {
 		Array ret;

@@ -6,6 +6,7 @@
 #include "uuid.h"
 #include "entity.h"
 #include "component.h"
+#include "gltf_stream.h"
 
 void register_anitya_types()
 {
@@ -15,6 +16,7 @@ void register_anitya_types()
     ClassDB::register_class<Entity>();
     ClassDB::register_class<Component>();
     ClassDB::register_class<ASPS>();
+    ClassDB::register_class<GLTFParser>();
 
     // ClassDB::register_class<AudioClientUpdatePosition>();
     // ClassDB::register_class<JoinChannelParameter>();

@@ -48,9 +48,12 @@ class IDB: public Reference
             DB_UNKOWN
         };
 
-        virtual void init() {}
-        virtual Ref<LocalAssetData> get_asset(int p_asset_id) { return nullptr; }
-        virtual int create_asset(Ref<LocalAssetData> p_data) { return 0; }
+        virtual bool init(const String& p_path) { return true; }
+        // virtual Ref<LocalAssetData> get_asset(int p_asset_id) { return nullptr; }
+        // virtual int create_asset(Ref<LocalAssetData> p_data) { return 0; }
+        bool execute(const String& p_query) { return true; }
+        bool execute_with_args(const String& p_query, Array args) { return true; }
+        virtual String get_error_message() const { return String(""); }
 };
 
 #endif
