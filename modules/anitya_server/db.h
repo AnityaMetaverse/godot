@@ -51,8 +51,10 @@ class IDB: public Reference
         virtual bool init(const String& p_path) { return true; }
         // virtual Ref<LocalAssetData> get_asset(int p_asset_id) { return nullptr; }
         // virtual int create_asset(Ref<LocalAssetData> p_data) { return 0; }
-        bool execute(const String& p_query) { return true; }
-        bool execute_with_args(const String& p_query, Array args) { return true; }
+        virtual Array fetch(const String& p_query) { return Array(); }
+        virtual Array fetch_with_args(const String& p_query, Array args) { return Array(); }
+        virtual bool execute(const String& p_query) { return true; }
+        virtual bool execute_with_args(const String& p_query, Array args) { return true; }
         virtual String get_error_message() const { return String(""); }
 };
 
