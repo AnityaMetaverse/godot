@@ -84,126 +84,126 @@ Error GLTFDocumentStream::parse_from_stream(Ref<GLTFState> state, const PoolByte
 
 	/* PARSE EXTENSIONS */
 
-	print_line("Parsing extension");
+	// print_line("Parsing extension");
 	err = _parse_gltf_extensions(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE SCENE */
-	print_line("Parsing scenes");
+	// print_line("Parsing scenes");
 	err = _parse_scenes(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE NODES */
-	print_line("Parsing nodes");
+	// print_line("Parsing nodes");
 	err = _parse_nodes(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE BUFFERS */
-	print_line("Parsing buffers");
+	// print_line("Parsing buffers");
 	err = _parse_buffers(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE BUFFER VIEWS */
-	print_line("Parsing extension");
+	// print_line("Parsing extension");
 	err = _parse_buffer_views(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE ACCESSORS */
-	print_line("Parsing accessors");
+	// print_line("Parsing accessors");
 	err = _parse_accessors(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE IMAGES */
-	print_line("Parsing images");
+	// print_line("Parsing images");
 	err = _parse_images(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE TEXTURES */
-	print_line("Parsing textures");
+	// print_line("Parsing textures");
 	err = _parse_textures(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE TEXTURES */
-	print_line("Parsing materials");
+	// print_line("Parsing materials");
 	err = _parse_materials(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE SKINS */
-	print_line("Parsing skins");
+	// print_line("Parsing skins");
 	err = _parse_skins(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* DETERMINE SKELETONS */
-	print_line("determine skeletons");
+	// print_line("determine skeletons");
 	err = _determine_skeletons(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* CREATE SKELETONS */
-	print_line("crearte skeletons");
+	// print_line("crearte skeletons");
 	err = _create_skeletons(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* CREATE SKINS */
-	print_line("create skins");
+	// print_line("create skins");
 	err = _create_skins(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE MESHES (we have enough info now) */
-	print_line("Parsing meshes");
+	// print_line("Parsing meshes");
 	err = _parse_meshes(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE LIGHTS */
-	print_line("Parsing lights");
+	// print_line("Parsing lights");
 	err = _parse_lights(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE CAMERAS */
-	print_line("Parsing cameras");
+	// print_line("Parsing cameras");
 	err = _parse_cameras(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* PARSE ANIMATIONS */
-	print_line("Parsing animations");
+	// print_line("Parsing animations");
 	err = _parse_animations(state);
 	if (err != OK) {
 		return Error::FAILED;
 	}
 
 	/* ASSIGN SCENE NAMES */
-	print_line("assign scene names");
+	// print_line("assign scene names");
 	_assign_scene_names(state);
 
 	return OK;
@@ -247,7 +247,7 @@ Error GLTFDocumentStream::_parse_glb(const PoolByteArray &p_stream, Ref<GLTFStat
 	String text;
 	text.parse_utf8((const char *)json_data.ptr(), json_data.size());
 
-	print_line(text);
+	// print_line(text);
 	// return OK;
 	String err_txt;
 	int err_line;
