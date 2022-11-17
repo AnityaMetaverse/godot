@@ -25,10 +25,4 @@ void IDB::_bind_methods()
     BIND_VMETHOD(MethodInfo(Variant::ARRAY, "fetch", PropertyInfo(Variant::STRING, "query")));
     BIND_VMETHOD(MethodInfo(Variant::ARRAY, "fetch_with_args", PropertyInfo(Variant::STRING, "query"), PropertyInfo(Variant::ARRAY, "args")));
     BIND_VMETHOD(MethodInfo(Variant::STRING, "get_error_message"));
-    // ClassDB::bind_methodfi(D_METHOD("init"), &IDB::init);
-    // ClassDB::bind_method(D_METHOD("execute", "query"), &IDB::execute);
-    // ClassDB::bind_method(D_METHOD("execute_with_args", "query", "args"), &IDB::execute_with_args);
-    // ClassDB::bind_method(D_METHOD("get_error_message"), &IDB::get_error_message);
-    // ClassDB::bind_method(D_METHOD("create_asset", "asset_data"), &IDB::create_asset);
-    // ClassDB::bind_method(D_METHOD("get_asset", "asset_id"), &IDB::get_asset);
 }
