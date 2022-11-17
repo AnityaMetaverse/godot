@@ -1,8 +1,10 @@
 #include "asps.h"
 
+#include "modules/tracy/profiler.h"
 
 PoolByteArray ASPS::encode(const PoolByteArray& p_data)
 {
+    
     PoolByteArray result;
     result.resize(p_data.size() + 3);
     uint8_t* p = result.write().ptr();

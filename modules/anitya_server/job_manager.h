@@ -34,12 +34,15 @@ class JobManager: public Reference
         static void _bind_methods();
         static void _run_no_blocking(void* user_data);
         static void _run_blocking(void* user_data);
+
+    private:
+        void dispatch_jobs(Vector<Ref<AJob>>& p_jobs);
+        void update_jobs(Vector<Ref<AJob>>& p_current_jobs);
+        void move_jobs(Vector<Ref<AJob>>& p_jobs, Vector<Ref<AJob>>& p_current_jobs);
     
     public:
         bool add_job(Ref<AJob> p_job);
         // void _on_job_finished(Ref<AJob> p_job, Ref<JobResult> p_result);
-        void dispatch_jobs(Vector<Ref<AJob>>& p_jobs);
-        void update_jobs(Vector<Ref<AJob>>& p_jobs, Vector<Ref<AJob>>& p_current_jobs);
         // void cancel_job(const String& job_id);
         // String get_job_id(Ref<AJob> job) { return job->call("get_job_id"); } // Dummy
 

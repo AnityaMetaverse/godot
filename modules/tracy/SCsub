@@ -1,0 +1,9 @@
+Import("env")
+Import("env_modules")
+
+module_env = env_modules.Clone()
+
+# if env["use_profiler"]:
+# env.Append(CPPDEFINES=["PROFILER_ENABLED"])
+module_env.Append(CPPDEFINES=["PROFILER_ENABLED"])
+module_env.add_source_files(env.modules_sources, "*.cpp")
