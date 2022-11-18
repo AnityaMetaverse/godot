@@ -52,6 +52,7 @@
 #include <process.h>
 #include <regstr.h>
 #include <shlobj.h>
+#include "modules/godot_tracy/profiler.h"
 
 static const WORD MAX_CONSOLE_LINES = 1500;
 
@@ -1015,6 +1016,7 @@ LRESULT OS_Windows::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 				process_key_events();
 				if (!Main::is_iterating()) {
 					Main::iteration();
+					FrameMark;
 				}
 			}
 		} break;

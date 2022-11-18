@@ -1,3 +1,6 @@
 [submodule "modules/sqlite"]
 	path = modules/sqlite
 url=https://github.com/AnityaMetaverse/godot-sqlite
+[submodule "modules/godot_tracy/tracy"]
+	path = modules/godot_tracy/tracy
+	url = https://github.com/AnityaMetaverse/tracy

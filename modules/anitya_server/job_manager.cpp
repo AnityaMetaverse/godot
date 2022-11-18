@@ -1,5 +1,6 @@
 #include "job_manager.h"
 
+#include "modules/godot_tracy/profiler.h"
 
 void JobManager::start()
 {
@@ -28,14 +29,15 @@ void JobManager::_run_blocking(void* user_data)
 
 void JobManager::run_no_blocking()
 {
-    // while(!is_cancelled)
-    // {
-    //     no_blocking_job_mutex.lock();
-    //     { // Just to be fancy.
-    //         update_jobs(no_blocking_jobs, current_no_blocking_jobs);
-    //     }
-    //     no_blocking_job_mutex.unlock();
-    // }
+    while(!is_cancelled)
+    {
+        no_blocking_job_mutex.lock();
+        { // Just to be fancy.
+            move_jobs(no_blocking_jobs, current_no_blocking_jobs);
+        }
+        no_blocking_job_mutex.unlock();
+        update_jobs(current_no_blocking_jobs);
+    }
 }
 
 void JobManager::run_blocking()
@@ -120,8 +122,7 @@ bool JobManager::add_job(Ref<AJob> p_job)
 
 void JobManager::update_jobs(Vector<Ref<AJob>>& p_current_jobs)
 {
-
-    
+    ZoneScopedN( "Update Jobs" );
 
     for (int index = 0; index < p_current_jobs.size(); index++)
     {
