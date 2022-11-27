@@ -20,6 +20,12 @@ void NetRequestData::_bind_methods()
     ClassDB::bind_method(D_METHOD("get_host"), &NetRequestData::get_host);
     ClassDB::bind_method(D_METHOD("set_host", "host"), &NetRequestData::set_host);
 
+    ClassDB::bind_method(D_METHOD("get_callback_method"), &NetRequestData::get_callback_method);
+    ClassDB::bind_method(D_METHOD("set_callback_method", "callback_method"), &NetRequestData::set_callback_method);
+
+    ClassDB::bind_method(D_METHOD("get_tag"), &NetRequestData::get_tag);
+    ClassDB::bind_method(D_METHOD("set_tag", "tag"), &NetRequestData::set_tag);
+
     ClassDB::bind_method(D_METHOD("get_port"), &NetRequestData::get_port);
     ClassDB::bind_method(D_METHOD("set_port", "port"), &NetRequestData::set_port);
 
@@ -29,6 +35,8 @@ void NetRequestData::_bind_methods()
     ADD_PROPERTY(PropertyInfo(Variant::POOL_BYTE_ARRAY, "body", PROPERTY_HINT_NONE), "set_body", "get_body");
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "url_params", PROPERTY_HINT_NONE), "set_url_params", "get_url_params");
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "host", PROPERTY_HINT_NONE), "set_host", "get_host");
+    ADD_PROPERTY(PropertyInfo(Variant::STRING, "callback_method", PROPERTY_HINT_NONE), "set_callback_method", "get_callback_method");
+    ADD_PROPERTY(PropertyInfo(Variant::STRING, "tag", PROPERTY_HINT_NONE), "set_tag", "get_tag");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "port", PROPERTY_HINT_NONE), "set_port", "get_port");
 }
 

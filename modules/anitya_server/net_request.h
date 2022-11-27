@@ -16,7 +16,9 @@ class NetRequestData: public Reference
         PoolByteArray body;
         String url_params;
         String host; 
-        int port;     
+        int port;
+        String callback_method;
+        String tag;   
 
     protected:
         static void _bind_methods();
@@ -36,6 +38,12 @@ class NetRequestData: public Reference
 
         void set_url_params(const String& p_url_params) { url_params = p_url_params; }
         String get_url_params() const { return url_params; }
+
+        void set_callback_method(const String& p_callback_method) { callback_method = p_callback_method; }
+        String get_callback_method() const { return callback_method; }
+
+        void set_tag(const String& p_tag) { tag = p_tag; }
+        String get_tag() const { return tag; }
 
         void set_host(const String& p_host) { host = p_host; }
         String get_host() const { return host; }
@@ -80,6 +88,7 @@ class NetRequest: public Reference
         HTTPClient client;
         bool _done = false;
         PoolByteArray body;
+        
 
         enum State
         {

@@ -16,7 +16,7 @@ class ASPS: public Reference
     
     private:
         static const uint8_t version = 1;
-        static const uint8_t magic_number = 97;
+        static const uint32_t magic_number = 0x0A4171A0;
     
     protected:
         static void _bind_methods();

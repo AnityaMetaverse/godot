@@ -3984,9 +3984,12 @@ void OS_X11::run() {
 #ifdef JOYDEV_ENABLED
 		joypad->process_joypads();
 #endif
+
 		if (Main::iteration()) {
+			
 			break;
 		}
+		FrameMark;
 	};
 
 	main_loop->finish();

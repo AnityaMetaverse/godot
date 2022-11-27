@@ -49,17 +49,25 @@ void Component::_bind_methods()
     ClassDB::bind_method(D_METHOD("set_expected_properties", "expected_properties"), &Component::set_expected_properties);
     ClassDB::bind_method(D_METHOD("get_expected_properties"), &Component::get_expected_properties);
     ClassDB::bind_method(D_METHOD("get_properties"), &Component::get_properties);
+    ClassDB::bind_method(D_METHOD("_init"), &Component::_init);
 
     // ClassDB::bind_method(D_METHOD("_on_component_added"), &Component::_on_component_added);
 
 
     // ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "entity"), "set_entity", "get_entity");
-    ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "uuid"), "set_uuid", "get_uuid");
+    // ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "uuid"), "set_uuid", "get_uuid");
     ADD_PROPERTY(PropertyInfo(Variant::POOL_STRING_ARRAY, "expected_properties"), "set_expected_properties", "get_expected_properties");
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "component_name"), "set_component_name", "get_component_name");
+
+    ADD_SIGNAL(MethodInfo("component_ready", PropertyInfo(Variant::OBJECT, "component")));
 }
 
-Component::Component(): uuid(memnew(UUID))
+void Component::_init()
+{
+    // uuid = Ref<UUID>(memnew(UUID));
+}
+
+Component::Component(): uuid(Ref<UUID>(memnew(UUID)))
 {
 
 }

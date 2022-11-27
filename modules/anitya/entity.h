@@ -46,7 +46,7 @@ class Entity: public Spatial
         //HACK: IT MUST BE Vector<Component>
         Vector<Variant> get_components() const;
 
-
+        void start();
         // void dummy(DummyEntity* e) {}
 
         Node* find_component_by_uuid(const Ref<UUID>& p_uuid);

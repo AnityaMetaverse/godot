@@ -6,13 +6,13 @@ PoolByteArray ASPS::encode(const PoolByteArray& p_data)
 {
     
     PoolByteArray result;
-    result.resize(p_data.size() + 3);
+    result.resize(p_data.size() + 6);
     uint8_t* p = result.write().ptr();
-    *p = magic_number;
-    *(p + 1) = version;
-    *(p + 2) = (uint8_t)45;
+    *((uint32_t*)(p)) = magic_number;
+    *(p + 4) = version;
+    *(p + 5) = (uint8_t)45;
 
-    p = result.write().ptr() + 3;
+    p = result.write().ptr() + 6;
 
 
     const uint8_t* origin = p_data.read().ptr();
@@ -29,28 +29,28 @@ PoolByteArray ASPS::decode(const PoolByteArray& p_data)
 {
     PoolByteArray result;
     const uint8_t* data = p_data.read().ptr();
-    if (*data != magic_number)
+    if (*((uint32_t*)data) != magic_number)
     {
         WARN_PRINT("Unrecognised data format");
         return result;
     }
 
-    if (*(data + 1) != version)
+    if (*(data + 4) != version)
     {
         WARN_PRINT(String("Invalid version. Current is: ") + String(itos(version)));
         return result;
     }
 
-    if (*(data + 2) != (uint8_t)45)
+    if (*(data + 5) != (uint8_t)45)
     {
         WARN_PRINT("No end of header found");
         return result;
     }
 
-    result.resize(p_data.size() - 3);
+    result.resize(p_data.size() - 6);
 
     uint8_t* destiny = result.write().ptr();
-    const uint8_t* origin = data + 3;
+    const uint8_t* origin = data + 6;
 
     for (int index = 0; index < result.size(); index++)
     {

@@ -7,14 +7,23 @@ void Entity::set_property(const Ref<ComponentProperty>& p_property, const Ref<UU
 
 }
 
+void Entity::start()
+{
+    for (int index = 0; index < components.size(); index++)
+    {
+        components[index]->start();
+    }
+}
+
 void Entity::add_component(Node* p_component)
 {
     Component* c = Object::cast_to<Component>(p_component);
     if (c)
     {
-        c->call("set_entity", this);
+        c->set_entity(this);
         components.push_back(c);
         add_child(c);
+        c->call("start");
         emit_signal("component_added", c);
         // connect("component_added", c, "_on_component_added");
     }
@@ -103,6 +112,7 @@ void Entity::_bind_methods()
     ClassDB::bind_method(D_METHOD("get_entity_name"), &Entity::get_entity_name);
     ClassDB::bind_method(D_METHOD("set_uuid", "uuid"), &Entity::set_uuid);
     ClassDB::bind_method(D_METHOD("get_uuid"), &Entity::get_uuid);
+    ClassDB::bind_method(D_METHOD("start"), &Entity::start);
 
     ClassDB::bind_method(D_METHOD("get_components"), &Entity::get_components);
 
@@ -121,5 +131,10 @@ Entity::Entity(): entity_name("Entity"), uuid(Ref<UUID>(memnew(UUID)))
 
 Entity::~Entity()
 {
-
+    for (int index = 0; index < components.size(); index++)
+    {
+        // Component* c = components[index];
+        // components[index] = nullptr;
+        // c->queue_delete();
+    }
 }

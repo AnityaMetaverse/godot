@@ -53,19 +53,7 @@ class Component: public Node
 
         //HACK: It must be Enitty class.
         void set_entity(Node* p_entity);
-        // {
-        //     Entity* e = Object::cast_to<Entity>(p_entity);
-        //     if (e)
-        //     {
-        //         entity = e; 
-        //     }
-        //     else
-        //     {
-        //         WARN_PRINT("p_entity doesn't inherit from Entity");
-        //     }
-        // }
         // //HACK: IT MUST BE AN Entity
-        // virtual Node* get_entity() const { return (Node*)entity; }
         Node* get_entity() const { return (Node*)entity; }
         //HACK: It must be a Vector<ComponentProperty>
         Vector<Variant> get_properties() { return Vector<Variant>(); }
@@ -75,6 +63,7 @@ class Component: public Node
         virtual void destroy() { queue_delete(); }
         void set_expected_properties(const PoolStringArray& p_expected_properties) { expected_properties = p_expected_properties; }
         PoolStringArray get_expected_properties() const { return expected_properties; }
+        void _init();
 
         // virtual void _on_component_added(Node* p_component) {}
         Component();

@@ -2,10 +2,20 @@
 
 bool AnityaHTTP::make_request(Ref<NetRequestData> p_data)
 {
+    if (p_data->get_callback_method() == "")
+    {
+        ERR_PRINT("Must provide a callback method");
+        return false;
+    }
     request_mutex.lock();
 
     Ref<NetRequest> r = Ref<NetRequest>(memnew(NetRequest));
-    r->connect("request_finished", p_data->get_requester(), "_on_request_finished");
+    Error err = r->connect("request_finished", p_data->get_requester(), p_data->get_callback_method());
+    if (err != OK)
+    {
+        ERR_PRINT(String("Cannot connect method: ") + String(p_data->get_callback_method()));
+        return false;
+    }
     if (!r->start(p_data))
     {
         request_mutex.unlock();
