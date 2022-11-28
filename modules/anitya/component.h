@@ -40,7 +40,7 @@ class Component: public Node
     private:
         Ref<UUID> uuid;
         String component_name;
-        Entity* entity;
+        Entity* entity = nullptr;
         PoolStringArray expected_properties;
 
     protected:
@@ -63,7 +63,7 @@ class Component: public Node
         virtual void destroy() { queue_delete(); }
         void set_expected_properties(const PoolStringArray& p_expected_properties) { expected_properties = p_expected_properties; }
         PoolStringArray get_expected_properties() const { return expected_properties; }
-        void _init();
+        // void _init();
 
         // virtual void _on_component_added(Node* p_component) {}
         Component();
