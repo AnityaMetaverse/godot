@@ -3705,7 +3705,7 @@ int Tree::get_button_id_at_position(const Point2 &p_pos) const {
 }
 
 String Tree::get_tooltip(const Point2 &p_pos) const {
-	if (root) {
+	if (root && show_cell_tooltips) {
 		Point2 pos = p_pos;
 		pos -= cache.bg->get_offset();
 		pos.y -= _get_title_button_height();
@@ -3812,6 +3812,14 @@ bool Tree::get_allow_reselect() const {
 	return allow_reselect;
 }
 
+void Tree::set_show_cell_tooltips(bool p_show) {
+	show_cell_tooltips = p_show;
+}
+
+bool Tree::get_show_cell_tooltips() const {
+	return show_cell_tooltips;
+}
+
 void Tree::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_range_click_timeout"), &Tree::_range_click_timeout);
 	ClassDB::bind_method(D_METHOD("_gui_input"), &Tree::_gui_input);
@@ -3873,10 +3881,14 @@ void Tree::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_allow_reselect", "allow"), &Tree::set_allow_reselect);
 	ClassDB::bind_method(D_METHOD("get_allow_reselect"), &Tree::get_allow_reselect);
 
+	ClassDB::bind_method(D_METHOD("set_show_cell_tooltips", "show"), &Tree::set_show_cell_tooltips);
+	ClassDB::bind_method(D_METHOD("get_show_cell_tooltips"), &Tree::get_show_cell_tooltips);
+
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "columns"), "set_columns", "get_columns");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "column_titles_visible"), "set_column_titles_visible", "are_column_titles_visible");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_reselect"), "set_allow_reselect", "get_allow_reselect");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_rmb_select"), "set_allow_rmb_select", "get_allow_rmb_select");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "show_cell_tooltips"), "set_show_cell_tooltips", "get_show_cell_tooltips");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "hide_folding"), "set_hide_folding", "is_folding_hidden");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "hide_root"), "set_hide_root", "is_root_hidden");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "drop_mode_flags", PROPERTY_HINT_FLAGS, "On Item,In between"), "set_drop_mode_flags", "get_drop_mode_flags");
@@ -4003,6 +4015,8 @@ Tree::Tree() {
 
 	allow_reselect = false;
 	propagate_mouse_activated = false;
+
+	show_cell_tooltips = true;
 
 	update_cache();
 }
