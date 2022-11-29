@@ -51,4 +51,5 @@ void AnityaHTTP::update()
 void AnityaHTTP::_bind_methods()
 {
     ClassDB::bind_method(D_METHOD("make_request", "request_data"), &AnityaHTTP::make_request);
+    ClassDB::bind_method(D_METHOD("update"), &AnityaHTTP::update);
 }

@@ -59,7 +59,7 @@ void Component::_bind_methods()
     ADD_PROPERTY(PropertyInfo(Variant::POOL_STRING_ARRAY, "expected_properties"), "set_expected_properties", "get_expected_properties");
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "component_name"), "set_component_name", "get_component_name");
 
-    // ADD_SIGNAL(MethodInfo("component_ready", PropertyInfo(Variant::OBJECT, "component")));
+    ADD_SIGNAL(MethodInfo("component_ready", PropertyInfo(Variant::OBJECT, "component")));
 }
 
 // void Component::_init()
