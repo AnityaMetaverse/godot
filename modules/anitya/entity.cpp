@@ -103,6 +103,7 @@ void Entity::_bind_methods()
 {
     ClassDB::bind_method(D_METHOD("set_property", "property", "uuid"), &Entity::set_property);
     ClassDB::bind_method(D_METHOD("add_component", "component"), &Entity::add_component);
+    ClassDB::bind_method(D_METHOD("remove_component", "component"), &Entity::remove_component);
 
     ClassDB::bind_method(D_METHOD("find_component_by_uuid", "uuid"), &Entity::find_component_by_uuid);
     ClassDB::bind_method(D_METHOD("find_component_by_name", "name"), &Entity::find_component_by_name);
