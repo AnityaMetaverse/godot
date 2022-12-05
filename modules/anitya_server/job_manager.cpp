@@ -74,6 +74,8 @@ void JobManager::move_jobs(Vector<Ref<AJob>>& p_jobs, Vector<Ref<AJob>>& p_curre
 void JobManager::stop()
 {
     is_cancelled = true;
+    blocking_job_thread.wait_to_finish();
+    no_blocking_job_thread.wait_to_finish();
 }
 
 bool JobManager::add_job(Ref<AJob> p_job)
