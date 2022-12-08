@@ -336,6 +336,8 @@ void AudioDriverCoreAudio::finish() {
 }
 
 Error AudioDriverCoreAudio::capture_init() {
+  Float64 sampleRate;
+
 	AudioComponentDescription desc;
 	memset(&desc, 0, sizeof(desc));
 	desc.componentType = kAudioUnitType_Output;
@@ -373,13 +375,44 @@ Error AudioDriverCoreAudio::capture_init() {
 #ifdef OSX_ENABLED
 	AudioDeviceID deviceId;
 	size = sizeof(AudioDeviceID);
-	AudioObjectPropertyAddress property = { kAudioHardwarePropertyDefaultInputDevice, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+
+	AudioObjectPropertyAddress property = {
+    kAudioHardwarePropertyDefaultInputDevice,
+    kAudioObjectPropertyScopeGlobal, 
+    kAudioObjectPropertyElementMaster
+  };
 
 	result = AudioObjectGetPropertyData(kAudioObjectSystemObject, &property, 0, NULL, &size, &deviceId);
 	ERR_FAIL_COND_V(result != noErr, FAILED);
 
 	result = AudioUnitSetProperty(input_unit, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &deviceId, sizeof(AudioDeviceID));
 	ERR_FAIL_COND_V(result != noErr, FAILED);
+
+  size = sizeof(sampleRate);
+
+  result = AudioUnitGetProperty(input_unit, kAudioUnitProperty_SampleRate, kAudioUnitScope_Input, kInputBus, &sampleRate, &size);
+	ERR_FAIL_COND_V(result != noErr, FAILED);
+
+  AudioObjectPropertyAddress propAddr = {
+    kAudioDevicePropertyAvailableNominalSampleRates,
+    kAudioObjectPropertyScopeGlobal,
+    kAudioObjectPropertyElementMaster
+  };
+
+  UInt32 propertySize = sizeof(AudioDeviceID);
+  AudioObjectGetPropertyDataSize(deviceId, &propAddr, 0, NULL, &propertySize);
+  int m_valueCount = propertySize / sizeof(AudioValueRange);
+
+  AudioValueRange m_valueTabe[m_valueCount];
+  AudioObjectGetPropertyData(deviceId, &propAddr, 0, NULL, &propertySize, m_valueTabe);
+
+  print_line("Available Sample Rates:");
+  print_line(itos(m_valueCount));
+
+  for(UInt32 i = 0 ; i < m_valueCount ; ++i) {
+      print_line("Available Sample Rate value :");
+      print_line(rtos(m_valueTabe[i].mMinimum));
+  }
 #endif
 
 	AudioStreamBasicDescription strdesc;
@@ -405,18 +438,40 @@ Error AudioDriverCoreAudio::capture_init() {
 
 	mix_rate = GLOBAL_GET("audio/mix_rate");
 
+  // rtos
+  // itos
+  print_verbose("sampleRate");
+  print_verbose(rtos(sampleRate));
+  print_verbose("deviceId");
+  print_verbose(itos(deviceId));
+  print_verbose("mix_rate");
+  print_verbose(itos(mix_rate));
+  print_verbose("-----");
+
 	memset(&strdesc, 0, sizeof(strdesc));
+  sampleRate = 48000.0;
+
 	strdesc.mFormatID = kAudioFormatLinearPCM;
 	strdesc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
 	strdesc.mChannelsPerFrame = capture_channels;
-	strdesc.mSampleRate = mix_rate;
+	strdesc.mSampleRate = sampleRate;
 	strdesc.mFramesPerPacket = 1;
 	strdesc.mBitsPerChannel = 16;
 	strdesc.mBytesPerFrame = strdesc.mBitsPerChannel * strdesc.mChannelsPerFrame / 8;
 	strdesc.mBytesPerPacket = strdesc.mBytesPerFrame * strdesc.mFramesPerPacket;
 
 	result = AudioUnitSetProperty(input_unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, kInputBus, &strdesc, sizeof(strdesc));
+
+  size = sizeof(sampleRate);
+
+  AudioValueRange inputSampleRate;
+  inputSampleRate.mMinimum = sampleRate;
+  inputSampleRate.mMaximum = sampleRate;
+  AudioUnitSetProperty(input_unit, kAudioDevicePropertyNominalSampleRate, kAudioUnitScope_Input, kInputBus, &inputSampleRate, sizeof(inputSampleRate));
+
 	ERR_FAIL_COND_V(result != noErr, FAILED);
+
+  // Resample the audio if the sample rate could not be set
 
 	AURenderCallbackStruct callback;
 	memset(&callback, 0, sizeof(AURenderCallbackStruct));
@@ -627,6 +682,43 @@ void AudioDriverCoreAudio::_set_device(const String &device, bool capture) {
 		OSStatus result = AudioUnitSetProperty(capture ? input_unit : audio_unit, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &deviceId, sizeof(AudioDeviceID));
 		ERR_FAIL_COND(result != noErr);
 
+
+    UInt32 size;
+    Float64 sampleRate;
+    size = sizeof(sampleRate);
+    AudioUnitGetProperty(input_unit, kAudioUnitProperty_SampleRate, kAudioUnitScope_Input, kInputBus, &sampleRate, &size);
+
+    AudioStreamBasicDescription strdesc;
+    memset(&strdesc, 0, sizeof(strdesc));
+    size = sizeof(strdesc);
+    AudioUnitGetProperty(input_unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, kInputBus, &strdesc, &size);
+
+    switch (strdesc.mChannelsPerFrame) {
+      case 1: // Mono
+        capture_channels = 1;
+        break;
+
+      case 2: // Stereo
+        capture_channels = 2;
+        break;
+
+      default:
+        // Unknown number of channels, default to stereo
+        capture_channels = 2;
+        break;
+    }
+
+    memset(&strdesc, 0, sizeof(strdesc));
+    strdesc.mFormatID = kAudioFormatLinearPCM;
+    strdesc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+    strdesc.mChannelsPerFrame = capture_channels;
+    strdesc.mSampleRate = sampleRate;
+    strdesc.mFramesPerPacket = 1;
+    strdesc.mBitsPerChannel = 16;
+    strdesc.mBytesPerFrame = strdesc.mBitsPerChannel * strdesc.mChannelsPerFrame / 8;
+    strdesc.mBytesPerPacket = strdesc.mBytesPerFrame * strdesc.mFramesPerPacket;
+
+    result = AudioUnitSetProperty(input_unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, kInputBus, &strdesc, sizeof(strdesc));
 		if (capture) {
 			// Reset audio input to keep synchronisation.
 			input_position = 0;
