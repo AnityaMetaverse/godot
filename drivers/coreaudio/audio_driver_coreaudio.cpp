@@ -445,7 +445,12 @@ Error AudioDriverCoreAudio::capture_init() {
   AudioValueRange inputSampleRate;
   inputSampleRate.mMinimum = sampleRate;
   inputSampleRate.mMaximum = sampleRate;
-  AudioUnitSetProperty(input_unit, kAudioDevicePropertyNominalSampleRate, kAudioUnitScope_Input, kInputBus, &inputSampleRate, sizeof(inputSampleRate));
+
+  AudioObjectPropertyAddress address;
+  address.mSelector = kAudioDevicePropertyNominalSampleRate;
+  address.mScope = kAudioObjectPropertyScopeInput;
+  address.mElement = kAudioObjectPropertyElementMaster;
+  AudioObjectSetPropertyData(deviceId, &address, 0, NULL,  sizeof(inputSampleRate), &inputSampleRate);
 
   if (sampleRate != mix_rate) {
     mix_rate = sampleRate;
@@ -710,7 +715,12 @@ void AudioDriverCoreAudio::_set_device(const String &device, bool capture) {
       AudioValueRange inputSampleRate;
       inputSampleRate.mMinimum = sampleRate;
       inputSampleRate.mMaximum = sampleRate;
-      AudioUnitSetProperty(input_unit, kAudioDevicePropertyNominalSampleRate, kAudioUnitScope_Input, kInputBus, &inputSampleRate, sizeof(inputSampleRate));
+
+      AudioObjectPropertyAddress address;
+      address.mSelector = kAudioDevicePropertyNominalSampleRate;
+      address.mScope = kAudioObjectPropertyScopeInput;
+      address.mElement = kAudioObjectPropertyElementMaster;
+      AudioObjectSetPropertyData(deviceId, &address, 0, NULL,  sizeof(inputSampleRate), &inputSampleRate);
 
       if (sampleRate != mix_rate) {
         mix_rate = sampleRate;
