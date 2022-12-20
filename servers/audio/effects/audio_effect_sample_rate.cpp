@@ -35,9 +35,6 @@
 void AudioEffectSampleRateInstance::process(const AudioFrame *p_src_frames, AudioFrame *p_dst_frames, int p_frame_count) {
 	float frames_until_next_sample = AudioServer::get_singleton()->get_mix_rate() / base->rate;
 
-  print_verbose(rtos(base->rate));
-  print_verbose(rtos(AudioServer::get_singleton()->get_mix_rate()));
-
 	for (int i = 0; i < p_frame_count; i++) {
 		if (processed_frames >= frames_until_next_sample) {
 			last_sampled_frame = p_src_frames[i]; // sample a new frame
