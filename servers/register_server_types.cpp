@@ -54,6 +54,7 @@
 #include "audio/effects/audio_effect_spectrum_analyzer.h"
 #include "audio/effects/audio_effect_stereo_enhance.h"
 #include "audio/effects/audio_stream_generator.h"
+#include "audio/effects/audio_effect_capture_sample_rate.h"
 #include "audio_server.h"
 #include "camera/camera_feed.h"
 #include "camera_server.h"
@@ -173,6 +174,7 @@ void register_server_types() {
 		ClassDB::register_virtual_class<AudioEffectSpectrumAnalyzerInstance>();
 
 		ClassDB::register_class<AudioEffectCapture>();
+		ClassDB::register_class<AudioEffectCaptureSampleRate>();
 	}
 
 	ClassDB::register_class<CameraFeed>();
