@@ -417,6 +417,11 @@ Error AudioDriverCoreAudio::capture_init() {
   }
 #endif
 
+  print_line("sampleRate");
+  print_line(rtos(sampleRate));
+  print_line("mix_rate");
+  print_line(rtos(mix_rate));
+
 	AudioStreamBasicDescription strdesc;
 	memset(&strdesc, 0, sizeof(strdesc));
 	size = sizeof(strdesc);
@@ -452,14 +457,10 @@ Error AudioDriverCoreAudio::capture_init() {
   address.mElement = kAudioObjectPropertyElementMaster;
   AudioObjectSetPropertyData(deviceId, &address, 0, NULL,  sizeof(inputSampleRate), &inputSampleRate);
 
-  if (sampleRate != mix_rate) {
-    mix_rate = sampleRate;
-  }
-
 	strdesc.mFormatID = kAudioFormatLinearPCM;
 	strdesc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
 	strdesc.mChannelsPerFrame = capture_channels;
-	strdesc.mSampleRate = mix_rate;
+	strdesc.mSampleRate = sampleRate;
 	strdesc.mFramesPerPacket = 1;
 	strdesc.mBitsPerChannel = 16;
 	strdesc.mBytesPerFrame = strdesc.mBitsPerChannel * strdesc.mChannelsPerFrame / 8;
@@ -721,10 +722,6 @@ void AudioDriverCoreAudio::_set_device(const String &device, bool capture) {
       address.mScope = kAudioObjectPropertyScopeInput;
       address.mElement = kAudioObjectPropertyElementMaster;
       AudioObjectSetPropertyData(deviceId, &address, 0, NULL,  sizeof(inputSampleRate), &inputSampleRate);
-
-      if (sampleRate != mix_rate) {
-        mix_rate = sampleRate;
-      }
 		}
 	}
 }
