@@ -4,6 +4,7 @@
 #include "servers/audio_server.h"
 
 void AudioEffectCaptureSampleRateInstance::process(const AudioFrame *p_src_frames, AudioFrame *p_dst_frames, int p_frame_count) {
+    RingBuffer<AudioFrame> &buffer = base->buffer;
 	float frames_until_next_sample = AudioServer::get_singleton()->get_mix_rate() / base->rate;
 
 	for (int i = 0; i < p_frame_count; i++) {
@@ -18,13 +19,13 @@ void AudioEffectCaptureSampleRateInstance::process(const AudioFrame *p_src_frame
 		processed_frames++;
 	}
 
-    if (buffer.space_left() >= processed_frames) {
+    if (buffer.space_left() >= p_frame_count) {
 		// Add incoming audio frames to the IO ring buffer
-		int32_t ret = buffer.write(p_src_frames, processed_frames);
-		ERR_FAIL_COND_MSG(ret != processed_frames, "Failed to add data to effect capture ring buffer despite sufficient space.");
-		base->pushed_frames += processed_frames;
+		int32_t ret = buffer.write(p_dst_frames, p_frame_count);
+		ERR_FAIL_COND_MSG(ret != p_frame_count, "Failed to add data to effect capture ring buffer despite sufficient space.");
+		base->pushed_frames += p_frame_count;
 	} else {
-		base->discarded_frames += processed_frames;
+		base->discarded_frames += p_frame_count;
 	}
 }
 
@@ -32,6 +33,12 @@ Ref<AudioEffectInstance> AudioEffectCaptureSampleRate::instance() {
 	Ref<AudioEffectCaptureSampleRateInstance> ins;
 	ins.instance();
 	ins->base = Ref<AudioEffectCaptureSampleRate>(this);
+    if (!buffer_initialized) {
+		float target_buffer_size = AudioServer::get_singleton()->get_mix_rate() * buffer_length_seconds;
+		ERR_FAIL_COND_V(target_buffer_size <= 0 || target_buffer_size >= (1 << 27), Ref<AudioEffectInstance>());
+		buffer.resize(nearest_shift((int)target_buffer_size));
+		buffer_initialized = true;
+	}
 	return ins;
 }
 
@@ -134,4 +141,9 @@ void AudioEffectCaptureSampleRate::clear_buffer() {
 AudioEffectCaptureSampleRate::AudioEffectCaptureSampleRate() {
 	rate = 11025.0f;
 	mix = 1.0f;
+
+    discarded_frames = 0;
+    pushed_frames = 0;
+    buffer_length_seconds = 0.1f;
+    buffer_initialized = false;
 }
