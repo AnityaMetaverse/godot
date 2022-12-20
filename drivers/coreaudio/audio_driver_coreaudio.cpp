@@ -336,6 +336,8 @@ void AudioDriverCoreAudio::finish() {
 }
 
 Error AudioDriverCoreAudio::capture_init() {
+  Float64 sampleRate;
+
 	AudioComponentDescription desc;
 	memset(&desc, 0, sizeof(desc));
 	desc.componentType = kAudioUnitType_Output;
@@ -370,16 +372,49 @@ Error AudioDriverCoreAudio::capture_init() {
 	ERR_FAIL_COND_V(result != noErr, FAILED);
 
 	UInt32 size;
+  // Get the mix rate from the project and check if your microphone supports it.
+  mix_rate = GLOBAL_GET("audio/mix_rate");
 #ifdef OSX_ENABLED
 	AudioDeviceID deviceId;
 	size = sizeof(AudioDeviceID);
-	AudioObjectPropertyAddress property = { kAudioHardwarePropertyDefaultInputDevice, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+
+	AudioObjectPropertyAddress property = {
+    kAudioHardwarePropertyDefaultInputDevice,
+    kAudioObjectPropertyScopeGlobal, 
+    kAudioObjectPropertyElementMaster
+  };
 
 	result = AudioObjectGetPropertyData(kAudioObjectSystemObject, &property, 0, NULL, &size, &deviceId);
 	ERR_FAIL_COND_V(result != noErr, FAILED);
 
 	result = AudioUnitSetProperty(input_unit, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &deviceId, sizeof(AudioDeviceID));
 	ERR_FAIL_COND_V(result != noErr, FAILED);
+
+  size = sizeof(sampleRate);
+
+  // Get all the sample rates supported by the microphone and check if the project settings mix_rate is there
+  result = AudioUnitGetProperty(input_unit, kAudioUnitProperty_SampleRate, kAudioUnitScope_Input, kInputBus, &sampleRate, &size);
+	ERR_FAIL_COND_V(result != noErr, FAILED);
+
+  AudioObjectPropertyAddress propAddr = {
+    kAudioDevicePropertyAvailableNominalSampleRates,
+    kAudioObjectPropertyScopeGlobal,
+    kAudioObjectPropertyElementMaster
+  };
+
+  UInt32 propertySize = sizeof(AudioDeviceID);
+  AudioObjectGetPropertyDataSize(deviceId, &propAddr, 0, NULL, &propertySize);
+  int m_valueCount = propertySize / sizeof(AudioValueRange);
+
+  AudioValueRange m_valueTabe[m_valueCount];
+  AudioObjectGetPropertyData(deviceId, &propAddr, 0, NULL, &propertySize, m_valueTabe);
+
+  // Check for the godot mix_rate inside all the supported values from the microphone
+  for(UInt32 i = 0 ; i < m_valueCount ; ++i) {
+    if (m_valueTabe[i].mMinimum == mix_rate) {
+      sampleRate = m_valueTabe[i].mMinimum;
+    }
+  }
 #endif
 
 	AudioStreamBasicDescription strdesc;
@@ -403,9 +438,24 @@ Error AudioDriverCoreAudio::capture_init() {
 			break;
 	}
 
-	mix_rate = GLOBAL_GET("audio/mix_rate");
-
 	memset(&strdesc, 0, sizeof(strdesc));
+
+  // set the user microphone to godot mix_rate
+  size = sizeof(sampleRate);
+  AudioValueRange inputSampleRate;
+  inputSampleRate.mMinimum = sampleRate;
+  inputSampleRate.mMaximum = sampleRate;
+
+  AudioObjectPropertyAddress address;
+  address.mSelector = kAudioDevicePropertyNominalSampleRate;
+  address.mScope = kAudioObjectPropertyScopeInput;
+  address.mElement = kAudioObjectPropertyElementMaster;
+  AudioObjectSetPropertyData(deviceId, &address, 0, NULL,  sizeof(inputSampleRate), &inputSampleRate);
+
+  if (sampleRate != mix_rate) {
+    mix_rate = sampleRate;
+  }
+
 	strdesc.mFormatID = kAudioFormatLinearPCM;
 	strdesc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
 	strdesc.mChannelsPerFrame = capture_channels;
@@ -554,7 +604,9 @@ Array AudioDriverCoreAudio::_get_device_list(bool capture) {
 
 void AudioDriverCoreAudio::_set_device(const String &device, bool capture) {
 	AudioDeviceID deviceId;
+  Float64 sampleRate;
 	bool found = false;
+
 	if (device != "Default") {
 		AudioObjectPropertyAddress prop;
 
@@ -618,6 +670,7 @@ void AudioDriverCoreAudio::_set_device(const String &device, bool capture) {
 		AudioObjectPropertyAddress property = { elem, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
 
 		OSStatus result = AudioObjectGetPropertyData(kAudioObjectSystemObject, &property, 0, NULL, &size, &deviceId);
+
 		ERR_FAIL_COND(result != noErr);
 
 		found = true;
@@ -628,9 +681,50 @@ void AudioDriverCoreAudio::_set_device(const String &device, bool capture) {
 		ERR_FAIL_COND(result != noErr);
 
 		if (capture) {
+      UInt32 size;
 			// Reset audio input to keep synchronisation.
 			input_position = 0;
 			input_size = 0;
+
+      // Get all the sample rates supported by the microphone and check if the project settings mix_rate is there
+      size = sizeof(sampleRate);
+      AudioUnitGetProperty(input_unit, kAudioUnitProperty_SampleRate, kAudioUnitScope_Input, kInputBus, &sampleRate, &size);
+
+      AudioObjectPropertyAddress propAddr = {
+        kAudioDevicePropertyAvailableNominalSampleRates,
+        kAudioObjectPropertyScopeGlobal,
+        kAudioObjectPropertyElementMaster
+      };
+
+      UInt32 propertySize = sizeof(AudioDeviceID);
+      AudioObjectGetPropertyDataSize(deviceId, &propAddr, 0, NULL, &propertySize);
+      int m_valueCount = propertySize / sizeof(AudioValueRange);
+
+      AudioValueRange m_valueTabe[m_valueCount];
+      AudioObjectGetPropertyData(deviceId, &propAddr, 0, NULL, &propertySize, m_valueTabe);
+
+      // Check for the godot mix_rate inside all the supported values from the microphone
+      for(UInt32 i = 0 ; i < m_valueCount ; ++i) {
+        if (m_valueTabe[i].mMinimum == mix_rate) {
+          sampleRate = m_valueTabe[i].mMinimum;
+        }
+      }
+
+      // set the user microphone to godot mix_rate
+      size = sizeof(sampleRate);
+      AudioValueRange inputSampleRate;
+      inputSampleRate.mMinimum = sampleRate;
+      inputSampleRate.mMaximum = sampleRate;
+
+      AudioObjectPropertyAddress address;
+      address.mSelector = kAudioDevicePropertyNominalSampleRate;
+      address.mScope = kAudioObjectPropertyScopeInput;
+      address.mElement = kAudioObjectPropertyElementMaster;
+      AudioObjectSetPropertyData(deviceId, &address, 0, NULL,  sizeof(inputSampleRate), &inputSampleRate);
+
+      if (sampleRate != mix_rate) {
+        mix_rate = sampleRate;
+      }
 		}
 	}
 }

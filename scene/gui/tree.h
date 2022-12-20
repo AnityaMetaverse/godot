@@ -337,6 +337,7 @@ private:
 	int selected_col;
 	int popup_edited_item_col;
 	bool hide_root;
+	bool show_cell_tooltips;
 	SelectMode select_mode;
 
 	int blocked;
@@ -603,6 +604,9 @@ public:
 
 	void set_allow_reselect(bool p_allow);
 	bool get_allow_reselect() const;
+
+	void set_show_cell_tooltips(bool p_show);
+	bool get_show_cell_tooltips() const;
 
 	Tree();
 	~Tree();
