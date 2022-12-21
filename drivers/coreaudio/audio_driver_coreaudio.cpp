@@ -416,12 +416,6 @@ Error AudioDriverCoreAudio::capture_init() {
     }
   }
 #endif
-
-  print_line("sampleRate");
-  print_line(rtos(sampleRate));
-  print_line("mix_rate");
-  print_line(rtos(mix_rate));
-
 	AudioStreamBasicDescription strdesc;
 	memset(&strdesc, 0, sizeof(strdesc));
 	size = sizeof(strdesc);
@@ -447,15 +441,6 @@ Error AudioDriverCoreAudio::capture_init() {
 
   // set the user microphone to godot mix_rate
   size = sizeof(sampleRate);
-  AudioValueRange inputSampleRate;
-  inputSampleRate.mMinimum = sampleRate;
-  inputSampleRate.mMaximum = sampleRate;
-
-  AudioObjectPropertyAddress address;
-  address.mSelector = kAudioDevicePropertyNominalSampleRate;
-  address.mScope = kAudioObjectPropertyScopeInput;
-  address.mElement = kAudioObjectPropertyElementMaster;
-  AudioObjectSetPropertyData(deviceId, &address, 0, NULL,  sizeof(inputSampleRate), &inputSampleRate);
 
 	strdesc.mFormatID = kAudioFormatLinearPCM;
 	strdesc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
@@ -722,6 +707,42 @@ void AudioDriverCoreAudio::_set_device(const String &device, bool capture) {
       address.mScope = kAudioObjectPropertyScopeInput;
       address.mElement = kAudioObjectPropertyElementMaster;
       AudioObjectSetPropertyData(deviceId, &address, 0, NULL,  sizeof(inputSampleRate), &inputSampleRate);
+
+      AudioStreamBasicDescription strdesc;
+      memset(&strdesc, 0, sizeof(strdesc));
+      size = sizeof(strdesc);
+      result = AudioUnitGetProperty(input_unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, kInputBus, &strdesc, &size);
+
+      switch (strdesc.mChannelsPerFrame) {
+        case 1: // Mono
+          capture_channels = 1;
+          break;
+
+        case 2: // Stereo
+          capture_channels = 2;
+          break;
+
+        default:
+          // Unknown number of channels, default to stereo
+          capture_channels = 2;
+          break;
+      }
+
+      memset(&strdesc, 0, sizeof(strdesc));
+
+      // set the user microphone to godot mix_rate
+      size = sizeof(sampleRate);
+
+      strdesc.mFormatID = kAudioFormatLinearPCM;
+      strdesc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+      strdesc.mChannelsPerFrame = capture_channels;
+      strdesc.mSampleRate = sampleRate;
+      strdesc.mFramesPerPacket = 1;
+      strdesc.mBitsPerChannel = 16;
+      strdesc.mBytesPerFrame = strdesc.mBitsPerChannel * strdesc.mChannelsPerFrame / 8;
+      strdesc.mBytesPerPacket = strdesc.mBytesPerFrame * strdesc.mFramesPerPacket;
+
+      AudioUnitSetProperty(input_unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, kInputBus, &strdesc, sizeof(strdesc));
 		}
 	}
 }
