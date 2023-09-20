@@ -32,7 +32,7 @@ void JobManager::run_no_blocking()
     while(!is_cancelled)
     {
         no_blocking_job_mutex.lock();
-        { // Just to be fancy.
+        {
             move_jobs(no_blocking_jobs, current_no_blocking_jobs);
         }
         no_blocking_job_mutex.unlock();
@@ -45,14 +45,7 @@ void JobManager::run_blocking()
     while(!is_cancelled)
     {
         blocking_job_mutex.lock();
-        { // Just to be fancy.
-            // while (blocking_jobs.size() != 0)
-            // {
-            //     Ref<AJob> job = blocking_jobs[0];
-            //     job->call("start");
-            //     current_blocking_jobs.push_back(job);
-            //     p_jobs.remove(0);
-            // }
+        {
             move_jobs(blocking_jobs, current_blocking_jobs);
         }
         blocking_job_mutex.unlock();
@@ -86,12 +79,6 @@ bool JobManager::add_job(Ref<AJob> p_job)
         return false;
     }
 
-    // Error err = p_job->connect("finished", this, "_on_job_finished");
-    // if (err != OK)
-    // {
-    //     WARN_PRINT(String("Error connecting signal") + String(itos(err)));
-    // }
-
     switch(p_job->get_scope())
     {
         case AJob::Scope::JOB_SCOPE_REMOTE:
@@ -108,23 +95,12 @@ bool JobManager::add_job(Ref<AJob> p_job)
             blocking_job_mutex.unlock();
             break;
     }
-
-
-
-
-
-    // job_mutex.lock();
-
-    
-    // current_jobs.push_back(p_job);
-    
-    // job_mutex.unlock();
     return true;
 }
 
 void JobManager::update_jobs(Vector<Ref<AJob>>& p_current_jobs)
 {
-    ZoneScopedN( "Update Jobs" );
+    // ZoneScopedN( "Update Jobs" );
 
     for (int index = 0; index < p_current_jobs.size(); index++)
     {
@@ -163,6 +139,21 @@ void JobManager::dispatch_jobs(Vector<Ref<AJob>>& p_jobs)
     }
 }
 
+void JobManager::cancel_job(const String& p_job_id)
+{
+
+}
+
+void JobManager::cancel_blocking_jobs()
+{
+
+}
+
+void JobManager::cancel_no_blocking_jobs()
+{
+
+}
+
 // void JobManager::_on_job_finished(Ref<AJob> p_job, Ref<JobResult> p_result)
 // {
 //     WARN_PRINT(String("--------------------- Removing job"));
@@ -176,11 +167,13 @@ void JobManager::dispatch_jobs(Vector<Ref<AJob>>& p_jobs)
 
 void JobManager::_bind_methods()
 {
-    // ClassDB::bind_method(D_METHOD("get_job_id"), &JobManager::get_job_id);
     ClassDB::bind_method(D_METHOD("start"), &JobManager::start);
     ClassDB::bind_method(D_METHOD("stop"), &JobManager::stop);
+    ClassDB::bind_method(D_METHOD("cancel_job", "job_id"), &JobManager::cancel_job);
+    ClassDB::bind_method(D_METHOD("cancel_all_jobs"), &JobManager::cancel_all_jobs);
+    ClassDB::bind_method(D_METHOD("cancel_no_blocking_jobs"), &JobManager::cancel_no_blocking_jobs);
+    ClassDB::bind_method(D_METHOD("cancel_blocking_jobs"), &JobManager::cancel_blocking_jobs);
     ClassDB::bind_method(D_METHOD("add_job", "job"), &JobManager::add_job);
-    // ClassDB::bind_method(D_METHOD("_on_job_finished", "job", "job_result"), &JobManager::_on_job_finished);
     ADD_SIGNAL(MethodInfo("job_finished", PropertyInfo(Variant::STRING, "job_id"), PropertyInfo(Variant::OBJECT, "job_result")));
 }
 

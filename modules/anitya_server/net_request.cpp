@@ -61,6 +61,7 @@ bool NetRequest::start(Ref<NetRequestData> p_data)
 {
     _done = false;
     request_data = p_data;
+    client.set_read_chunk_size(65536 * 2);
     // print_line(String("Connecting to: ") + p_data->get_host() + itos(p_data->get_port()));
     int error = client.connect_to_host(p_data->get_host(), p_data->get_port());
     state = State::CONNECTING;

@@ -42,6 +42,14 @@ class JobManager: public Reference
     
     public:
         bool add_job(Ref<AJob> p_job);
+        void cancel_job(const String& p_job);
+        void cancel_no_blocking_jobs();
+        void cancel_blocking_jobs();
+        void cancel_all_jobs()
+        {
+            cancel_no_blocking_jobs();
+            cancel_blocking_jobs();
+        }
         // void _on_job_finished(Ref<AJob> p_job, Ref<JobResult> p_result);
         // void cancel_job(const String& job_id);
         // String get_job_id(Ref<AJob> job) { return job->call("get_job_id"); } // Dummy

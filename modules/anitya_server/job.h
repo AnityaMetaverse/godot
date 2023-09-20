@@ -76,6 +76,7 @@ class AJob: public Reference
         bool is_done() const { return _done; }
 
     public:
+        virtual void cancel() const {}
         virtual String get_job_id() const { return job_id; }
         virtual void start() {}
         virtual void update() {}
