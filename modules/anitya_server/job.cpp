@@ -32,6 +32,7 @@ void AJob::_bind_methods()
 
 
     ClassDB::bind_method(D_METHOD("start"), &AJob::start);
+    ClassDB::bind_method(D_METHOD("cancel"), &AJob::cancel);
     ClassDB::bind_method(D_METHOD("update"), &AJob::update);
     ClassDB::bind_method(D_METHOD("done"), &AJob::done);
     ClassDB::bind_method(D_METHOD("is_done"), &AJob::is_done);

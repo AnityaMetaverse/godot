@@ -87,6 +87,7 @@ class NetRequest: public Reference
         Ref<NetRequestResponse> request_response;
         HTTPClient client;
         bool _done = false;
+        bool _is_chunked = false;
         PoolByteArray body;
         
 
@@ -104,6 +105,7 @@ class NetRequest: public Reference
         void _do_requesting();
         void _do_fetching();
         void finish_request();
+        PoolByteArray _get_data_from_chunked_data(const PoolByteArray& p_data);
     
     protected:
         static void _bind_methods();

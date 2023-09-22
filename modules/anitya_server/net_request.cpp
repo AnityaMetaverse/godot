@@ -138,6 +138,11 @@ void NetRequest::_do_requesting()
         if (body)
         {
             state = State::FETCHING;
+            if (client.has_response())
+            {
+                WARN_PRINT("Response is chunked!");
+                _is_chunked = client.is_response_chunked();
+            }
         }
         else
         {
@@ -148,6 +153,55 @@ void NetRequest::_do_requesting()
             finish_request();
         }
     }
+}
+
+PoolByteArray NetRequest::_get_data_from_chunked_data(const PoolByteArray& p_data)
+{
+    PoolByteArray raw_body;
+
+    if (!p_data.size())
+    {
+        return p_data;
+    }
+
+    int64_t base = 0;
+    int64_t index = 0;
+    int64_t full_size = 0;
+
+    while (true)
+    {
+        base = index;
+        while(p_data[index] != '\r' && index < p_data.size()) { ++index; }
+        // WARN_PRINT("Chunk loop");
+        const char* base_ptr = reinterpret_cast<const char*>(p_data.read().ptr() + base);
+        // https://en.cppreference.com/w/c/string/byte/atoi
+        int64_t cs = atoi(base_ptr);
+        if (!cs) { break; }
+
+        full_size += cs;
+        index += 2 + cs + 2;
+    }
+
+    raw_body.resize(full_size);
+
+    base = 0;
+    index = 0;
+    int raw_index = 0;
+
+    while(true)
+    {
+        base = index;
+        while(p_data[index] != '\r' && index < p_data.size()) { ++index; }
+        const char* base_ptr = reinterpret_cast<const char*>(p_data.read().ptr() + base);
+        int64_t cs = atoi(base_ptr);
+        if (!cs) { break; }
+
+        memcpy(raw_body.write().ptr() + raw_index, p_data.read().ptr() + index + 2, cs);
+        raw_index += cs;
+        index += 2 + cs + 2;
+    }
+
+    return raw_body;
 }
 
 void NetRequest::_do_fetching()
@@ -164,6 +218,13 @@ void NetRequest::_do_fetching()
             return;
         }
         PoolByteArray chunk = client.read_response_body_chunk();
+        // if (chunk.size() == 0)
+        // {
+        //     finish_request();
+        //     return;
+        // }
+
+        // WARN_PRINT(itos(chunk.size()));
         body.append_array(chunk);
 
         // OS::get_singleton()->delay_usec(500 * 1000);
@@ -174,6 +235,10 @@ void NetRequest::_do_fetching()
         // request_response = Ref<NetRequestResponse>(memnew(NetRequestResponse));
         // request_response->set_error(OK);
         // request_response->set_data(body);
+        if (_is_chunked)
+        {
+            body = _get_data_from_chunked_data(body);
+        }
         finish_request();
         
     }

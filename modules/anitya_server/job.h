@@ -4,23 +4,7 @@
 #include "core/reference.h"
 
 
-class JobResult: public Reference
-{
-    GDCLASS(JobResult, Reference);
-    private:
-        bool succeed;
-        Dictionary data;
-    
-    protected:
-        static void _bind_methods();
-    public:
-        void set_data(const Dictionary& p_data) { data = p_data; }
-        Dictionary get_data() { return data; }
-        void set_succeed(bool p_succeed) { succeed = p_succeed; }
-        bool get_succeed() { return succeed; }
-
-        // void _init(bool p_succeed, const Dictionary& p_data);
-};
+class JobResult;
 
 class JobStatus: public Reference
 {
@@ -49,6 +33,12 @@ class AJob: public Reference
         {
             JOB_DUTY_MUST,
             JOB_DUTY_MAYBE
+        };
+
+        enum FinishReason
+        {
+            NORMAL,
+            CANCELLED
         };
 
     private:
@@ -84,8 +74,28 @@ class AJob: public Reference
         ~AJob();
 };
 
+class JobResult: public Reference
+{
+    GDCLASS(JobResult, Reference);
+    private:
+        bool succeed;
+        Dictionary data;
+        AJob::FinishReason _finish_reason = AJob::FinishReason::NORMAL;
+    
+    protected:
+        static void _bind_methods();
+    public:
+        void set_data(const Dictionary& p_data) { data = p_data; }
+        Dictionary get_data() { return data; }
+        void set_succeed(bool p_succeed) { succeed = p_succeed; }
+        bool get_succeed() { return succeed; }
+
+        // void _init(bool p_succeed, const Dictionary& p_data);
+};
+
 VARIANT_ENUM_CAST(AJob::Priority);
 VARIANT_ENUM_CAST(AJob::Scope);
 VARIANT_ENUM_CAST(AJob::Duty);
+VARIANT_ENUM_CAST(AJob::FinishReason);
 
 #endif
