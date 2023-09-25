@@ -140,7 +140,7 @@ void NetRequest::_do_requesting()
             state = State::FETCHING;
             if (client.has_response())
             {
-                WARN_PRINT("Response is chunked!");
+                // WARN_PRINT("Response is chunked!");
                 _is_chunked = client.is_response_chunked();
             }
         }
