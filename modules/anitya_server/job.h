@@ -72,6 +72,12 @@ class AJob: public Reference
         virtual void update() {}
         AJob();
         ~AJob();
+    
+    public:
+        bool operator==(AJob* p_other)
+        {
+            return call("get_job_id") == p_other->call("get_job_id");
+        }
 };
 
 class JobResult: public Reference

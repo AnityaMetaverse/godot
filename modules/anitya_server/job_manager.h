@@ -25,6 +25,10 @@ class JobManager: public Reference
         Mutex blocking_job_mutex;
         Vector<Ref<AJob>> blocking_jobs;
         Vector<Ref<AJob>> current_blocking_jobs;
+
+        PoolStringArray _job_ids;
+
+        Mutex _search_job_mutex;
         
 
         bool has_started = false;
@@ -53,6 +57,8 @@ class JobManager: public Reference
         // void _on_job_finished(Ref<AJob> p_job, Ref<JobResult> p_result);
         // void cancel_job(const String& job_id);
         // String get_job_id(Ref<AJob> job) { return job->call("get_job_id"); } // Dummy
+
+        bool _search_job(Ref<AJob> p_new_job);
 
         void start();
         void stop();

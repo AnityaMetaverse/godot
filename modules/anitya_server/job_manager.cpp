@@ -75,23 +75,34 @@ bool JobManager::add_job(Ref<AJob> p_job)
 {
     if (!has_started)
     {
-        WARN_PRINT("JobManager wasn't initialized");
+        ERR_PRINT("JobManager wasn't initialized");
         return false;
+    }
+
+    /**
+     * DO not add it if it was previously added. 
+     * It doesn't fail if it exists. It is just that someone is ahead of you.
+     */
+    if (_search_job(p_job))
+    {
+        return true;
     }
 
     switch(p_job->get_scope())
     {
         case AJob::Scope::JOB_SCOPE_REMOTE:
             no_blocking_job_mutex.lock();
-                print_line("Adding remote job");
+                // print_line("Adding remote job");
                 no_blocking_jobs.push_back(p_job);
+                _job_ids.push_back(p_job->call("get_job_id"));
             no_blocking_job_mutex.unlock();
             break;
         
         case AJob::Scope::JOB_SCOPE_LOCAL:
             blocking_job_mutex.lock();
-                print_line("Adding local job");
+                // print_line("Adding local job");
                 blocking_jobs.push_back(p_job);
+                _job_ids.push_back(p_job->call("get_job_id"));
             blocking_job_mutex.unlock();
             break;
     }
@@ -108,9 +119,22 @@ void JobManager::update_jobs(Vector<Ref<AJob>>& p_current_jobs)
         job->call("update");
         if (job->is_done())
         {
+            // WARN_PRINT("update_jobs: search job lock");
+            _search_job_mutex.lock();
+            // WARN_PRINT(itos(_job_ids.size()));
+            for (int index = 0; index < _job_ids.size(); index++)
+            {
+                if (_job_ids[index] == job->call("get_job_id"))
+                {
+                    _job_ids.remove(index);
+                    break;
+                }
+            }
+            // WARN_PRINT("update_jobs: search job UNlock");
+            _search_job_mutex.unlock();
             Ref<JobResult> result = job->get_job_result();
             String id = job->call("get_job_id");
-            // p_current_jobs.remove(index);
+            
             emit_signal("job_finished", id, result);
         }
     }
@@ -129,7 +153,7 @@ void JobManager::dispatch_jobs(Vector<Ref<AJob>>& p_jobs)
         if (job->is_done())
         {
             p_jobs.remove(index);
-            // memdelete(job.ptr());
+            
             continue;
         }
         else
@@ -137,6 +161,30 @@ void JobManager::dispatch_jobs(Vector<Ref<AJob>>& p_jobs)
             index++;
         }
     }
+}
+
+bool JobManager::_search_job(Ref<AJob> p_new_job)
+{
+    
+    // WARN_PRINT("_search_job: Searching for a job lock");
+    _search_job_mutex.lock();
+    {
+        // WARN_PRINT(itos(_job_ids.size()));
+        for (int index = 0; index < _job_ids.size(); index++)
+        {
+            if (_job_ids[index] == p_new_job->call("get_job_id"))
+            {
+                // WARN_PRINT("_search_job: Searching for a job UNlock");
+                _search_job_mutex.unlock();
+                // WARN_PRINT("Job already found!!!");
+                return true;
+            }
+        }
+    }
+    // WARN_PRINT("_search_job: Searching for a job UNlock");
+    _search_job_mutex.unlock();
+
+    return false;
 }
 
 void JobManager::cancel_job(const String& p_job_id)
@@ -153,17 +201,6 @@ void JobManager::cancel_no_blocking_jobs()
 {
 
 }
-
-// void JobManager::_on_job_finished(Ref<AJob> p_job, Ref<JobResult> p_result)
-// {
-//     WARN_PRINT(String("--------------------- Removing job"));
-//     job_mutex.lock();
-//     {
-//         current_jobs.erase(p_job);
-//         emit_signal("job_finished", p_job->get_job_id(), p_result);
-//     }
-//     job_mutex.unlock();
-// }
 
 void JobManager::_bind_methods()
 {
