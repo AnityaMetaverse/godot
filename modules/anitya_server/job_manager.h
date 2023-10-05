@@ -43,6 +43,7 @@ class JobManager: public Reference
         void dispatch_jobs(Vector<Ref<AJob>>& p_jobs);
         void update_jobs(Vector<Ref<AJob>>& p_current_jobs);
         void move_jobs(Vector<Ref<AJob>>& p_jobs, Vector<Ref<AJob>>& p_current_jobs);
+        void loop_jobs(Vector<Ref<AJob>>& p_jobs, Vector<Ref<AJob>>& p_current_jobs, const Mutex& p_mutex);
     
     public:
         bool add_job(Ref<AJob> p_job);
@@ -54,6 +55,8 @@ class JobManager: public Reference
             cancel_no_blocking_jobs();
             cancel_blocking_jobs();
         }
+
+
         // void _on_job_finished(Ref<AJob> p_job, Ref<JobResult> p_result);
         // void cancel_job(const String& job_id);
         // String get_job_id(Ref<AJob> job) { return job->call("get_job_id"); } // Dummy

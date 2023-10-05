@@ -18,12 +18,14 @@ void JobManager::start()
 void JobManager::_run_no_blocking(void* user_data)
 {
     JobManager* jm = (JobManager*)user_data;
-    jm->run_no_blocking();
+    jm->loop_jobs(jm->no_blocking_jobs, jm->current_no_blocking_jobs, jm->no_blocking_job_mutex);
+    // jm->run_no_blocking();
 }
 
 void JobManager::_run_blocking(void* user_data)
 {
     JobManager* jm = (JobManager*)user_data;
+    // jm->loop_jobs(jm->blocking_jobs, jm->current_blocking_jobs, jm->blocking_job_mutex);
     jm->run_blocking();
 }
 
@@ -37,6 +39,29 @@ void JobManager::run_no_blocking()
         }
         no_blocking_job_mutex.unlock();
         update_jobs(current_no_blocking_jobs);
+
+        if (current_no_blocking_jobs.size() == 0)
+        {
+            break;
+        }
+    }
+}
+
+void JobManager::loop_jobs(Vector<Ref<AJob>>& p_jobs, Vector<Ref<AJob>>& p_current_jobs, const Mutex& p_mutex)
+{
+    while(!is_cancelled)
+    {
+        p_mutex.lock();
+        {
+            move_jobs(p_jobs, p_current_jobs);
+        }
+        p_mutex.unlock();
+        update_jobs(p_current_jobs);
+
+        if (p_current_jobs.size() == 0)
+        {
+            break;
+        }
     }
 }
 
@@ -92,17 +117,27 @@ bool JobManager::add_job(Ref<AJob> p_job)
     {
         case AJob::Scope::JOB_SCOPE_REMOTE:
             no_blocking_job_mutex.lock();
-                // print_line("Adding remote job");
+            {
+                bool runnning_thread = current_no_blocking_jobs.size() != 0;
                 no_blocking_jobs.push_back(p_job);
+                
+                if (!runnning_thread)
+                {
+                    no_blocking_job_thread.wait_to_finish();
+                    no_blocking_job_thread.start(&JobManager::_run_no_blocking, this);
+                }
+
                 _job_ids.push_back(p_job->call("get_job_id"));
+            }
             no_blocking_job_mutex.unlock();
             break;
         
         case AJob::Scope::JOB_SCOPE_LOCAL:
             blocking_job_mutex.lock();
-                // print_line("Adding local job");
+            {
                 blocking_jobs.push_back(p_job);
                 _job_ids.push_back(p_job->call("get_job_id"));
+            }
             blocking_job_mutex.unlock();
             break;
     }
