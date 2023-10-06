@@ -9,24 +9,29 @@ void JobManager::start()
         WARN_PRINT("The thread already started");
         return;
     }
-    no_blocking_job_thread.start(&JobManager::_run_no_blocking, this);
-    blocking_job_thread.start(&JobManager::_run_blocking, this);
+    is_running_blocking = false;
+    is_running_no_blocking = false;
+    // no_blocking_job_thread.start(&JobManager::_run_no_blocking, this);
+    // blocking_job_thread.start(&JobManager::_run_blocking, this);
     is_cancelled = false;
     has_started = true;
 }
 
 void JobManager::_run_no_blocking(void* user_data)
 {
+    
     JobManager* jm = (JobManager*)user_data;
     jm->loop_jobs(jm->no_blocking_jobs, jm->current_no_blocking_jobs, jm->no_blocking_job_mutex);
+    jm->is_running_no_blocking = false;
     // jm->run_no_blocking();
 }
 
 void JobManager::_run_blocking(void* user_data)
 {
     JobManager* jm = (JobManager*)user_data;
-    // jm->loop_jobs(jm->blocking_jobs, jm->current_blocking_jobs, jm->blocking_job_mutex);
-    jm->run_blocking();
+    jm->loop_jobs(jm->blocking_jobs, jm->current_blocking_jobs, jm->blocking_job_mutex);
+    jm->is_running_blocking = false;
+    // jm->run_blocking();
 }
 
 void JobManager::run_no_blocking()
@@ -49,7 +54,7 @@ void JobManager::run_no_blocking()
 
 void JobManager::loop_jobs(Vector<Ref<AJob>>& p_jobs, Vector<Ref<AJob>>& p_current_jobs, const Mutex& p_mutex)
 {
-    while(!is_cancelled)
+    while(!is_cancelled && (p_jobs.size() != 0 || p_current_jobs.size() != 0))
     {
         p_mutex.lock();
         {
@@ -57,11 +62,6 @@ void JobManager::loop_jobs(Vector<Ref<AJob>>& p_jobs, Vector<Ref<AJob>>& p_curre
         }
         p_mutex.unlock();
         update_jobs(p_current_jobs);
-
-        if (p_current_jobs.size() == 0)
-        {
-            break;
-        }
     }
 }
 
@@ -75,6 +75,24 @@ void JobManager::run_blocking()
         }
         blocking_job_mutex.unlock();
         update_jobs(current_blocking_jobs);
+    }
+}
+
+void JobManager::update()
+{
+    if (!is_running_no_blocking && no_blocking_jobs.size() != 0)
+    {
+        // WARN_PRINT("running no blocking thread!");
+        is_running_no_blocking = true;
+        no_blocking_job_thread.wait_to_finish();
+        no_blocking_job_thread.start(&JobManager::_run_no_blocking, this);
+    }
+
+    if (!is_running_blocking && blocking_jobs.size() != 0)
+    {
+        is_running_blocking = true;
+        blocking_job_thread.wait_to_finish();
+        blocking_job_thread.start(&JobManager::_run_blocking, this);
     }
 }
 
@@ -118,15 +136,7 @@ bool JobManager::add_job(Ref<AJob> p_job)
         case AJob::Scope::JOB_SCOPE_REMOTE:
             no_blocking_job_mutex.lock();
             {
-                bool runnning_thread = current_no_blocking_jobs.size() != 0;
                 no_blocking_jobs.push_back(p_job);
-                
-                if (!runnning_thread)
-                {
-                    no_blocking_job_thread.wait_to_finish();
-                    no_blocking_job_thread.start(&JobManager::_run_no_blocking, this);
-                }
-
                 _job_ids.push_back(p_job->call("get_job_id"));
             }
             no_blocking_job_mutex.unlock();
@@ -246,6 +256,7 @@ void JobManager::_bind_methods()
     ClassDB::bind_method(D_METHOD("cancel_no_blocking_jobs"), &JobManager::cancel_no_blocking_jobs);
     ClassDB::bind_method(D_METHOD("cancel_blocking_jobs"), &JobManager::cancel_blocking_jobs);
     ClassDB::bind_method(D_METHOD("add_job", "job"), &JobManager::add_job);
+    ClassDB::bind_method(D_METHOD("update"), &JobManager::update);
     ADD_SIGNAL(MethodInfo("job_finished", PropertyInfo(Variant::STRING, "job_id"), PropertyInfo(Variant::OBJECT, "job_result")));
 }
 

@@ -29,6 +29,9 @@ class JobManager: public Reference
         PoolStringArray _job_ids;
 
         Mutex _search_job_mutex;
+
+        bool is_running_no_blocking;
+        bool is_running_blocking;
         
 
         bool has_started = false;
@@ -55,6 +58,8 @@ class JobManager: public Reference
             cancel_no_blocking_jobs();
             cancel_blocking_jobs();
         }
+
+        void update();
 
 
         // void _on_job_finished(Ref<AJob> p_job, Ref<JobResult> p_result);
