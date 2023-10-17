@@ -273,6 +273,7 @@
 		</member>
 		<member name="audio/enable_audio_input" type="bool" setter="" getter="" default="false">
 			If [code]true[/code], microphone input will be allowed. This requires appropriate permissions to be set when exporting to Android or iOS.
+			[b]Note:[/b] If the operating system blocks access to audio input devices (due to the user's privacy settings), audio capture will only return silence. On Windows 10 and later, make sure that apps are allowed to access the microphone in the OS' privacy settings.
 		</member>
 		<member name="audio/mix_rate" type="int" setter="" getter="" default="44100">
 			The mixing rate used for audio (in Hz). In general, it's better to not touch this and leave it to the host operating system.
@@ -1214,7 +1215,7 @@
 			Default map up vector for 3D navigation maps. See [method NavigationServer.map_set_up].
 		</member>
 		<member name="network/limits/debugger_stdout/max_chars_per_second" type="int" setter="" getter="" default="2048">
-			Maximum amount of characters allowed to send as output from the debugger. Over this value, content is dropped. This helps not to stall the debugger connection.
+			Maximum amount of characters allowed to send as output from the debugger. Over this value, content is dropped with the message [code]"output overflow, print less text!"[/code]. This helps not to stall the debugger connection.
 		</member>
 		<member name="network/limits/debugger_stdout/max_errors_per_second" type="int" setter="" getter="" default="100">
 			Maximum number of errors allowed to be sent as output from the debugger. Over this value, content is dropped. This helps not to stall the debugger connection.
@@ -1544,9 +1545,10 @@
 		<member name="rendering/gles3/shaders/shader_compilation_mode" type="int" setter="" getter="" default="0">
 			If set to [code]Asynchronous[/code] and available on the target device, asynchronous compilation of shaders is enabled (in contrast to [code]Asynchronous[/code]).
 			That means that when a shader is first used under some new rendering situation, the game won't stall while such shader is being compiled. Instead, a fallback will be used and the real shader will be compiled in the background. Once the actual shader is compiled, it will be used the next times it's used to draw a frame.
-			Depending on the async mode configured for a given material/shader, the fallback will be an "ubershader" (the default) or just skip rendering any item it is applied to.
+			Depending on the [member SpatialMaterial.async_mode] mode configured for a given material, the fallback will be an "ubershader" (the default) or just skip rendering any item it is applied to. In custom [ShaderMaterial]s, the async mode is set using [code]render_mode async_visible;[/code] (default) or [code]render_mode async_hidden;[/code] at the top of the shader.
 			An ubershader is a very complex shader, slow but suited to any rendering situation, that the engine generates internally so it can be used from the beginning while the traditional conditioned, optimized version of it is being compiled.
 			To reduce loading times after the project has been launched at least once, you can use [code]Asynchronous + Cache[/code]. This also causes the ubershaders to be cached into storage so they can be ready faster next time they are used (provided the platform provides support for it).
+			[b]Note:[/b] Asynchronous compilation requires driver support for the [code]GL_ARB_get_program_binary[/code] OpenGL extension. This extension is supported by all hardware that supports OpenGL 4.1 or higher as well as most hardware that supports OpenGL 3.3 or higher.
 			[b]Note:[/b] Asynchronous compilation is currently only supported for spatial (3D) and particle materials/shaders. CanvasItem (2D) shaders will not use asynchronous compilation even if this setting is set to [code]Asynchronous[/code] or [code]Asynchronous + Cache[/code].
 		</member>
 		<member name="rendering/gles3/shaders/shader_compilation_mode.mobile" type="int" setter="" getter="" default="0">
@@ -1660,7 +1662,9 @@
 			[b]Note:[/b] The two video drivers are not drop-in replacements for each other, so a game designed for GLES3 might not work properly when falling back to GLES2. In particular, some features of the GLES3 backend are not available in GLES2. Enabling this setting also means that both ETC and ETC2 VRAM-compressed textures will be exported on Android and iOS, increasing the data pack's size.
 		</member>
 		<member name="rendering/quality/filters/anisotropic_filter_level" type="int" setter="" getter="" default="4">
-			Maximum anisotropic filter level used for textures with anisotropy enabled. Higher values will result in sharper textures when viewed from oblique angles, at the cost of performance. Only power-of-two values are valid (2, 4, 8, 16).
+			Maximum anisotropic filter level used for textures with anisotropy enabled. Higher values will result in sharper textures when viewed from oblique angles, at the cost of performance. With the exception of [code]1[/code], only power-of-two values are valid ([code]2[/code], [code]4[/code], [code]8[/code], [code]16[/code]). A value of [code]1[/code] forcibly disables anisotropic filtering, even on textures where it is enabled.
+			[b]Note:[/b] For performance reasons, anisotropic filtering [i]is not enabled by default[/i] on textures. For this setting to have an effect, anisotropic texture filtering can be enabled by selecting a texture in the FileSystem dock, going to the Import dock, checking the [b]Anisotropic[/b] checkbox then clicking [b]Reimport[/b]. However, anisotropic filtering is rarely useful in 2D, so only enable it for textures in 2D if it makes a meaningful visual difference.
+			[b]Note:[/b] This property is only read when the project starts. There is currently no way to change this setting at run-time.
 		</member>
 		<member name="rendering/quality/filters/msaa" type="int" setter="" getter="" default="0">
 			Sets the number of MSAA samples to use. MSAA is used to reduce aliasing around the edges of polygons. A higher MSAA value results in smoother edges but can be significantly slower on some hardware.
@@ -1670,9 +1674,11 @@
 			If set to a value greater than [code]0.0[/code], contrast-adaptive sharpening will be applied to the 3D viewport. This has a low performance cost and can be used to recover some of the sharpness lost from using FXAA. Values around [code]0.5[/code] generally give the best results. See also [member rendering/quality/filters/use_fxaa].
 		</member>
 		<member name="rendering/quality/filters/use_debanding" type="bool" setter="" getter="" default="false">
-			If [code]true[/code], uses a fast post-processing filter to make banding significantly less visible. In some cases, debanding may introduce a slightly noticeable dithering pattern. It's recommended to enable debanding only when actually needed since the dithering pattern will make lossless-compressed screenshots larger.
+			If [code]true[/code], uses a fast post-processing filter to make banding significantly less visible in 3D. 2D rendering is [i]not[/i] affected by debanding unless the [member Environment.background_mode] is [constant Environment.BG_CANVAS]. In this case, [member rendering/quality/intended_usage/framebuffer_allocation] must also be set to [b]3D[/b].
+			In some cases, debanding may introduce a slightly noticeable dithering pattern. It's recommended to enable debanding only when actually needed since the dithering pattern will make lossless-compressed screenshots larger.
 			[b]Note:[/b] Only available on the GLES3 backend. [member rendering/quality/depth/hdr] must also be [code]true[/code] for debanding to be effective.
 			[b]Note:[/b] There are known issues with debanding breaking rendering on mobile platforms. Due to this, it is recommended to leave this option disabled when targeting mobile platforms.
+			[b]Note:[/b] This property is only read when the project starts. To set debanding at run-time, set [member Viewport.debanding] on the root [Viewport] instead.
 		</member>
 		<member name="rendering/quality/filters/use_fxaa" type="bool" setter="" getter="" default="false">
 			Enables FXAA in the root Viewport. FXAA is a popular screen-space antialiasing method, which is fast but will make the image look blurry, especially at lower resolutions. It can still work relatively well at large resolutions such as 1440p and 4K. Some of the lost sharpness can be recovered by enabling contrast-adaptive sharpening (see [member rendering/quality/filters/sharpen_intensity]).

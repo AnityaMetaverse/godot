@@ -1,8 +1,10 @@
 name: 🐧 Linux Builds
-on: [push, pull_request]
+on:
+  workflow_call:
 
 # Global Settings
 env:
+  # Only used for the cache key. Increment version to force clean build.
   GODOT_BASE_BRANCH: 3.5
   SCONSFLAGS: verbose=yes warnings=all werror=yes
 
@@ -47,7 +49,7 @@ jobs:
             artifact: true
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Linux dependencies
         shell: bash
@@ -69,6 +71,9 @@ jobs:
 
       - name: Setup python and scons
         uses: ./.github/actions/godot-deps
+
+      - name: Setup GCC problem matcher
+        uses: ammaraskar/gcc-problem-matcher@master
 
       - name: Compilation
         uses: ./.github/actions/godot-build
@@ -129,6 +134,7 @@ jobs:
         if: ${{ matrix.artifact }}
         run: |
           strip bin/godot.*
+          chmod +x bin/godot.*
 
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact

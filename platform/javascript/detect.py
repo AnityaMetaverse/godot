@@ -157,9 +157,9 @@ def configure(env):
     env["ARCOM_POSIX"] = env["ARCOM"].replace("$TARGET", "$TARGET.posix").replace("$SOURCES", "$SOURCES.posix")
     env["ARCOM"] = "${TEMPFILE(ARCOM_POSIX)}"
 
-    # All intermediate files are just LLVM bitcode.
+    # All intermediate files are just object files.
     env["OBJPREFIX"] = ""
-    env["OBJSUFFIX"] = ".bc"
+    env["OBJSUFFIX"] = ".o"
     env["PROGPREFIX"] = ""
     # Program() output consists of multiple files, so specify suffixes manually at builder.
     env["PROGSUFFIX"] = ""
@@ -185,8 +185,15 @@ def configure(env):
     else:
         env.Append(CPPDEFINES=["NO_THREADS"])
 
+    # Get version info for checks below.
+    cc_semver = tuple(get_compiler_version(env))
+
+    if env["use_thinlto"] or env["use_lto"]:
+        # Workaround https://github.com/emscripten-core/emscripten/issues/19781.
+        if cc_semver >= (3, 1, 42) and cc_semver < (3, 1, 46):
+            env.Append(LINKFLAGS=["-Wl,-u,scalbnf"])
+
     if env["gdnative_enabled"]:
-        cc_semver = tuple(get_compiler_version(env))
         if cc_semver < (2, 0, 10):
             print("GDNative support requires emscripten >= 2.0.10, detected: %s.%s.%s" % cc_semver)
             sys.exit(255)
