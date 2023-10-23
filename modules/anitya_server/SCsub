@@ -1,7 +1,13 @@
 Import("env")
 Import("env_modules")
 
-env_bmp = env_modules.Clone()
+env_as = env_modules.Clone()
 
-# Godot's own source files
-env_bmp.add_source_files(env.modules_sources, "*.cpp")
+defines = ["ENABLE_STDCXX_SYNC"]
+
+if env["sync_jm_update_with_frame"] == True or env["platform"] == "javascript":
+    defines.append("JM_ENABLE_SYNC")
+
+env_as.Append(CPPDEFINES=defines)
+env_as.add_source_files(env.modules_sources, "*.cpp")
+

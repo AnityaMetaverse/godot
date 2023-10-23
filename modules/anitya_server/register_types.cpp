@@ -11,6 +11,7 @@
 #include "http.h"
 #include "net_request.h"
 #include "anitya_http.h"
+// #include "srt_client.h"
 #include "sqlite_db.h"
 
 void register_anitya_server_types()
@@ -30,6 +31,7 @@ void register_anitya_server_types()
     ClassDB::register_class<AJob>();
     ClassDB::register_class<JobManager>();
     ClassDB::register_class<Ticket>();
+    // ClassDB::register_class<SRTClient>();
 }
 
 void unregister_anitya_server_types() {}

@@ -7,6 +7,29 @@
 
 #include "job.h"
 
+#ifdef JM_ENABLE_SYNC
+    #define DEFINE_UPDATE_LOCKER(VARIABLE) bool _jm_##VARIABLE = false
+    #define UPDATE_CALLED(VARIABLE) _jm_##VARIABLE = true
+    // #define UNLOCK_UPDATE(VARIABLE) jm->_jm_##VARIABLE = false
+    #define GET_LOCKER(VARIABLE) _jm_##VARIABLE
+    #define LOOP_LOCKER(VARIABLE) while(!jm->GET_LOCKER(VARIABLE))
+    #define RESET_UPDATE(VARIABLE) jm->_jm_##VARIABLE = false
+    
+#else
+    #define DEFINE_UPDATE_LOCKER(VARIABLE)
+    #define UPDATE_CALLED(VARIABLE)
+    #define RESET_UPDATE(VARIABLE) 
+    #define GET_LOCKER(VARIABLE)
+    #define LOOP_LOCKER(VARIABLE)
+    #define RESET_UPDATE(VARIABLE)
+    #define PRINT_DEBUG print_line("UNSYNC!!!!")
+#endif
+
+#define DEFINE_NO_BLOCKING_UPDATE DEFINE_UPDATE_LOCKER(_no_blocking_update)
+#define NO_BLOCKING_UPDATE_CALLED UPDATE_CALLED(_no_blocking_update)
+#define NO_BLOCKING_RESET_UPDATE RESET_UPDATE(_no_blocking_update)
+#define NO_BLOCKING_LOOP_LOCKER LOOP_LOCKER(_no_blocking_update)
+
 class JobManager: public Reference
 {
     GDCLASS(JobManager, Reference);
@@ -36,6 +59,8 @@ class JobManager: public Reference
 
         bool has_started = false;
         bool is_cancelled = false;
+
+        DEFINE_NO_BLOCKING_UPDATE;
     
     protected:
         static void _bind_methods();

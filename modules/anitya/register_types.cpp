@@ -7,6 +7,7 @@
 #include "entity.h"
 #include "component.h"
 #include "gltf_stream.h"
+#include "livestream_data.h"
 
 void register_anitya_types()
 {
@@ -17,7 +18,7 @@ void register_anitya_types()
     ClassDB::register_class<Component>();
     ClassDB::register_class<ASPS>();
     ClassDB::register_class<GLTFParser>();
-
+    ClassDB::register_class<LivestreamData>();
     // ClassDB::register_class<AudioClientUpdatePosition>();
     // ClassDB::register_class<JoinChannelParameter>();
     // ClassDB::register_virtual_class<AudioClient>();

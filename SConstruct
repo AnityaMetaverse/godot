@@ -126,6 +126,7 @@ opts.Add(BoolVariable("production", "Set defaults to build Godot for use in prod
 opts.Add(BoolVariable("use_lto", "Use link-time optimization", False))
 opts.Add(BoolVariable("use_stream", "Include or not FFMPEG", True))
 opts.Add(BoolVariable("use_profiler", "Enable Profiler", False))
+opts.Add(BoolVariable("sync_jm_update_with_frame", "Enable no blocking jobs to sync with godot frame.", False))
 
 # Components
 opts.Add(BoolVariable("deprecated", "Enable deprecated features", True))
