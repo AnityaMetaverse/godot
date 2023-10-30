@@ -20,19 +20,21 @@ void JobManager::start()
 void JobManager::_run_no_blocking(void* user_data)
 {
     JobManager* jm = (JobManager*)user_data;
-    // jm->loop_jobs(jm->no_blocking_jobs, jm->current_no_blocking_jobs, jm->no_blocking_job_mutex);
-    while(!jm->is_cancelled && (jm->no_blocking_jobs.size() != 0 || jm->current_no_blocking_jobs.size() != 0))
-    {
-        NO_BLOCKING_LOOP_LOCKER;
-        NO_BLOCKING_RESET_UPDATE;
-        jm->no_blocking_job_mutex.lock();
-        {
-            jm->move_jobs(jm->no_blocking_jobs, jm->current_no_blocking_jobs);
-        }
-        jm->no_blocking_job_mutex.unlock();
-        jm->update_jobs(jm->current_no_blocking_jobs);
-    }
+    jm->loop_jobs(jm->no_blocking_jobs, jm->current_no_blocking_jobs, jm->no_blocking_job_mutex);
     jm->is_running_no_blocking = false;
+    // while(!jm->is_cancelled && (jm->no_blocking_jobs.size() != 0 || jm->current_no_blocking_jobs.size() != 0))
+    // {
+    //     NO_BLOCKING_LOOP_LOCKER;
+    //     NO_BLOCKING_RESET_UPDATE;
+    //     // print_line("Looping job!");
+    //     jm->no_blocking_job_mutex.lock();
+    //     {
+    //         jm->move_jobs(jm->no_blocking_jobs, jm->current_no_blocking_jobs);
+    //     }
+    //     jm->no_blocking_job_mutex.unlock();
+    //     jm->update_jobs(jm->current_no_blocking_jobs);
+    // }
+    // jm->is_running_no_blocking = false;
     // jm->run_no_blocking();
 }
 
@@ -90,7 +92,7 @@ void JobManager::run_blocking()
 
 void JobManager::update()
 {
-    NO_BLOCKING_UPDATE_CALLED;
+    // NO_BLOCKING_UPDATE_CALLED;
 
     if (!is_running_no_blocking && no_blocking_jobs.size() != 0)
     {

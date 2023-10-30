@@ -1,5 +1,8 @@
 #include "anitya_http.h"
 
+
+int AnityaHTTP::_instances = 0;
+
 bool AnityaHTTP::make_request(Ref<NetRequestData> p_data)
 {
     if (p_data->get_callback_method() == "")
@@ -30,6 +33,7 @@ bool AnityaHTTP::make_request(Ref<NetRequestData> p_data)
 
 void AnityaHTTP::update()
 {
+    #ifndef ANITYA_ONE_NET_REQUEST
     request_mutex.lock();
     {
         for (int index = 0; index < requests.size(); index++)
@@ -46,10 +50,46 @@ void AnityaHTTP::update()
         }
     }
     request_mutex.unlock();
+    #else
+    if (_current_request.ptr() == nullptr && requests.size() != 0)
+    {
+        request_mutex.lock();
+        {
+            const auto index = requests.size() - 1;
+            _current_request = requests.get(index);
+            requests.remove(index);
+        }
+        request_mutex.unlock();
+    }
+    else if (_current_request.ptr() != nullptr)
+    {
+        _current_request->update();
+        if (_current_request->is_done())
+        {
+            Ref<NetRequestResponse> response = _current_request->get_response();
+            _current_request->emit_signal("request_finished", response);
+            _current_request.unref();
+        }
+    }
+    #endif
 }
 
 void AnityaHTTP::_bind_methods()
 {
     ClassDB::bind_method(D_METHOD("make_request", "request_data"), &AnityaHTTP::make_request);
     ClassDB::bind_method(D_METHOD("update"), &AnityaHTTP::update);
+}
+
+AnityaHTTP::AnityaHTTP()
+{
+    ++_instances;
+    if (_instances > 1)
+    {
+        ERR_PRINT("More than one AnityaHttp instance!");
+    }
+}
+
+AnityaHTTP::~AnityaHTTP()
+{
+    --_instances;
 }

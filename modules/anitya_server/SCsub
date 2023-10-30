@@ -5,8 +5,10 @@ env_as = env_modules.Clone()
 
 defines = ["ENABLE_STDCXX_SYNC"]
 
-if env["sync_jm_update_with_frame"] == True or env["platform"] == "javascript":
-    defines.append("JM_ENABLE_SYNC")
+if env["one_net_request_at_time"] == True or env["platform"] == "javascript":
+    defines.append("ANITYA_ONE_NET_REQUEST")
+# if env["sync_jm_update_with_frame"] == True or env["platform"] == "javascript":
+#     defines.append("JM_ENABLE_SYNC")
 
 env_as.Append(CPPDEFINES=defines)
 env_as.add_source_files(env.modules_sources, "*.cpp")

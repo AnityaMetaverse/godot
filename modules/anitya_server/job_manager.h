@@ -4,16 +4,17 @@
 #include "core/reference.h"
 #include "core/vector.h"
 #include "core/os/thread.h"
+#include "core/os/semaphore.h"
 
 #include "job.h"
 
 #ifdef JM_ENABLE_SYNC
-    #define DEFINE_UPDATE_LOCKER(VARIABLE) bool _jm_##VARIABLE = false
-    #define UPDATE_CALLED(VARIABLE) _jm_##VARIABLE = true
+    #define DEFINE_UPDATE_LOCKER(VARIABLE) Semaphore _jm_##VARIABLE
+    #define UPDATE_CALLED(VARIABLE) _jm_##VARIABLE.post()
     // #define UNLOCK_UPDATE(VARIABLE) jm->_jm_##VARIABLE = false
     #define GET_LOCKER(VARIABLE) _jm_##VARIABLE
-    #define LOOP_LOCKER(VARIABLE) while(!jm->GET_LOCKER(VARIABLE))
-    #define RESET_UPDATE(VARIABLE) jm->_jm_##VARIABLE = false
+    #define LOOP_LOCKER(VARIABLE) jm->GET_LOCKER(VARIABLE).wait()
+    #define RESET_UPDATE(VARIABLE) 
     
 #else
     #define DEFINE_UPDATE_LOCKER(VARIABLE)

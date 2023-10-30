@@ -127,6 +127,7 @@ opts.Add(BoolVariable("use_lto", "Use link-time optimization", False))
 opts.Add(BoolVariable("use_stream", "Include or not FFMPEG", True))
 opts.Add(BoolVariable("use_profiler", "Enable Profiler", False))
 opts.Add(BoolVariable("sync_jm_update_with_frame", "Enable no blocking jobs to sync with godot frame.", False))
+opts.Add(BoolVariable("one_net_request_at_time", "Just one net_request will be performed in AnityaHttp", False))
 
 # Components
 opts.Add(BoolVariable("deprecated", "Enable deprecated features", True))
