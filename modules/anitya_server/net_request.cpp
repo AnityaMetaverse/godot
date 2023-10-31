@@ -210,7 +210,6 @@ void NetRequest::_do_fetching()
     bool fetching = s == HTTPClient::Status::STATUS_BODY;
     if (fetching)
     {
-        // print_line(String("Polling from fetching..."));
         Error error = client.poll();
         if (error != OK)
         {
@@ -218,27 +217,17 @@ void NetRequest::_do_fetching()
             return;
         }
         PoolByteArray chunk = client.read_response_body_chunk();
-        // if (chunk.size() == 0)
-        // {
-        //     finish_request();
-        //     return;
-        // }
-
-        // WARN_PRINT(itos(chunk.size()));
         body.append_array(chunk);
-
-        // OS::get_singleton()->delay_usec(500 * 1000);
     }
     else
     {
-        // _done = true;
-        // request_response = Ref<NetRequestResponse>(memnew(NetRequestResponse));
-        // request_response->set_error(OK);
-        // request_response->set_data(body);
+        #ifndef ANITYA_WEB
         if (_is_chunked)
         {
+            print_line("Parsing chunked respond");
             body = _get_data_from_chunked_data(body);
         }
+        #endif
         finish_request();
         
     }
@@ -249,15 +238,12 @@ void NetRequest::update()
     switch(state)
     {
         case State::CONNECTING:
-            // print_line(String("---------- Do connecting"));
             _do_connecting();
         break;
         case State::REQUESTING:
-            // print_line(String("---------- Do request"));
             _do_requesting();
         break;
         case State::FETCHING:
-            // print_line(String("---------- Do fetching"));
             _do_fetching();
         break;
     }

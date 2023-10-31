@@ -5,6 +5,9 @@ env_as = env_modules.Clone()
 
 defines = ["ENABLE_STDCXX_SYNC"]
 
+if env["platform"] == "javascript":
+    defines.append("ANITYA_WEB")
+
 if env["one_net_request_at_time"] == True or env["platform"] == "javascript":
     defines.append("ANITYA_ONE_NET_REQUEST")
 # if env["sync_jm_update_with_frame"] == True or env["platform"] == "javascript":
