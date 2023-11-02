@@ -145,13 +145,16 @@ bool JobManager::add_job(Ref<AJob> p_job)
         return true;
     }
 
+    String jid;
+    jid = p_job->call("get_job_id");
+
     switch(p_job->get_scope())
     {
         case AJob::Scope::JOB_SCOPE_REMOTE:
             no_blocking_job_mutex.lock();
             {
                 no_blocking_jobs.push_back(p_job);
-                _job_ids.push_back(p_job->call("get_job_id"));
+                _job_ids.push_back(jid);
             }
             no_blocking_job_mutex.unlock();
             break;
@@ -160,7 +163,7 @@ bool JobManager::add_job(Ref<AJob> p_job)
             blocking_job_mutex.lock();
             {
                 blocking_jobs.push_back(p_job);
-                _job_ids.push_back(p_job->call("get_job_id"));
+                _job_ids.push_back(jid);
             }
             blocking_job_mutex.unlock();
             break;
@@ -171,33 +174,47 @@ bool JobManager::add_job(Ref<AJob> p_job)
 void JobManager::update_jobs(Vector<Ref<AJob>>& p_current_jobs)
 {
     // ZoneScopedN( "Update Jobs" );
-
+    // print_line(itos(rand()));
     for (int index = 0; index < p_current_jobs.size(); index++)
     {
         Ref<AJob> job = p_current_jobs.get(index);
         job->call("update");
-        if (job->is_done())
-        {
-            // WARN_PRINT("update_jobs: search job lock");
-            _search_job_mutex.lock();
-            // WARN_PRINT(itos(_job_ids.size()));
-            for (int index = 0; index < _job_ids.size(); index++)
-            {
-                if (_job_ids[index] == job->call("get_job_id"))
-                {
-                    _job_ids.remove(index);
-                    break;
-                }
-            }
-            // WARN_PRINT("update_jobs: search job UNlock");
-            _search_job_mutex.unlock();
-            Ref<JobResult> result = job->get_job_result();
-            String id = job->call("get_job_id");
+        // if (job->is_done())
+        // {
+        //     String jid;
+        //     jid = job->call("get_job_id");
+        //     _search_job_mutex.lock();
+
+        //     for (int index = 0; index < _job_ids.size(); index++)
+        //     {
+        //         if (_job_ids[index] == jid)
+        //         {
+        //             _job_ids.remove(index);
+        //             break;
+        //         }
+        //     }
+
+        //     _search_job_mutex.unlock();
+        //     Ref<JobResult> result = job->get_job_result();
             
-            emit_signal("job_finished", id, result);
-        }
+        //     Error e = emit_signal("job_finished", jid, result);
+        //     // String msg = String("Job id finished: ") + jid;
+        //     // print_line(msg);
+        //     if (e != OK)
+        //     {
+        //         String s = "Error emiting signal. Signal error: ";
+        //         s += itos(e);
+        //         ERR_PRINT(s);
+        //     }
+        //     // call_deferred("emit_signal", "job_finished", jid, result);
+        // }
     }
     dispatch_jobs(p_current_jobs);
+}
+
+PoolStringArray JobManager::get_job_ids() const
+{
+    return _job_ids;
 }
 
 void JobManager::dispatch_jobs(Vector<Ref<AJob>>& p_jobs)
@@ -209,10 +226,31 @@ void JobManager::dispatch_jobs(Vector<Ref<AJob>>& p_jobs)
     while (index < p_jobs.size())
     {
         Ref<AJob> job = p_jobs[index];
+        String jid = job->call("get_job_id");
         if (job->is_done())
         {
+            _search_job_mutex.lock();
+            {
+                for (int index = 0; index < _job_ids.size(); index++)
+                {
+                    if (_job_ids[index] == jid)
+                    {
+                        _job_ids.remove(index);
+                        break;
+                    }
+                }
+            }
+            _search_job_mutex.unlock();
+            Ref<JobResult> result = job->get_job_result();
+            Error e = emit_signal("job_finished", jid, result);
+            if (e != OK)
+            {
+                String s = "Error emiting signal. Signal error: ";
+                s += itos(e);
+                ERR_PRINT(s);
+            }
+
             p_jobs.remove(index);
-            
             continue;
         }
         else
@@ -226,12 +264,15 @@ bool JobManager::_search_job(Ref<AJob> p_new_job)
 {
     
     // WARN_PRINT("_search_job: Searching for a job lock");
+    String job_id;
+    job_id = p_new_job->call("get_job_id");
     _search_job_mutex.lock();
     {
+        
         // WARN_PRINT(itos(_job_ids.size()));
         for (int index = 0; index < _job_ids.size(); index++)
         {
-            if (_job_ids[index] == p_new_job->call("get_job_id"))
+            if (_job_ids[index] == job_id)
             {
                 // WARN_PRINT("_search_job: Searching for a job UNlock");
                 _search_job_mutex.unlock();
@@ -243,6 +284,7 @@ bool JobManager::_search_job(Ref<AJob> p_new_job)
     // WARN_PRINT("_search_job: Searching for a job UNlock");
     _search_job_mutex.unlock();
 
+    // _ids.push_back(job_id);
     return false;
 }
 
@@ -271,16 +313,15 @@ void JobManager::_bind_methods()
     ClassDB::bind_method(D_METHOD("cancel_blocking_jobs"), &JobManager::cancel_blocking_jobs);
     ClassDB::bind_method(D_METHOD("add_job", "job"), &JobManager::add_job);
     ClassDB::bind_method(D_METHOD("update"), &JobManager::update);
+    ClassDB::bind_method(D_METHOD("get_job_ids"), &JobManager::get_job_ids);
     ADD_SIGNAL(MethodInfo("job_finished", PropertyInfo(Variant::STRING, "job_id"), PropertyInfo(Variant::OBJECT, "job_result")));
 }
 
 JobManager::JobManager()
 {
-    // job_thread = memnew(Thread);
 }
 
 JobManager::~JobManager()
 {
     stop();
-    // memdelete(job_thread);
 }

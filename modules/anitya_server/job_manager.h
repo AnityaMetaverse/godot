@@ -85,6 +85,8 @@ class JobManager: public Reference
             cancel_blocking_jobs();
         }
 
+        PoolStringArray get_job_ids() const;
+
         void update();
 
 

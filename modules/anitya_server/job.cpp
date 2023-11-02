@@ -74,6 +74,8 @@ AJob::AJob():   result(memnew(JobResult)),
 
 AJob::~AJob()
 {
+    // String s = String("job with id: ") + call("get_job_id") + String(" is being destroyed");
+    // print_line(s);
     // if (!result.is_null())
     // {
     //     memdelete(result.ptr());

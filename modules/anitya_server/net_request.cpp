@@ -224,7 +224,6 @@ void NetRequest::_do_fetching()
         #ifndef ANITYA_WEB
         if (_is_chunked)
         {
-            print_line("Parsing chunked respond");
             body = _get_data_from_chunked_data(body);
         }
         #endif
@@ -238,15 +237,23 @@ void NetRequest::update()
     switch(state)
     {
         case State::CONNECTING:
+            // print_line("connecting");
             _do_connecting();
+            return;
         break;
         case State::REQUESTING:
+            // print_line("requesting");
             _do_requesting();
+            return;
         break;
         case State::FETCHING:
+            // print_line("fetching");
             _do_fetching();
+            return;
         break;
     }
+
+    ERR_PRINT("ERROR!!!!!!! Somehow this point has been reached!");
 }
 
 void NetRequest::_bind_methods()
