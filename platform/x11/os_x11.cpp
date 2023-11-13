@@ -3989,7 +3989,7 @@ void OS_X11::run() {
 			
 			break;
 		}
-		FrameMark;
+		// FrameMark;
 	};
 
 	main_loop->finish();

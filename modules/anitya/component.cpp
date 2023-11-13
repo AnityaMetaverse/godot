@@ -60,6 +60,8 @@ void Component::_bind_methods()
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "component_name"), "set_component_name", "get_component_name");
 
     ADD_SIGNAL(MethodInfo("component_ready", PropertyInfo(Variant::OBJECT, "component")));
+    ADD_SIGNAL(MethodInfo("component_failed", PropertyInfo(Variant::OBJECT, "error")));
+    ADD_SIGNAL(MethodInfo("component_skipped", PropertyInfo(Variant::OBJECT, "warning")));
 }
 
 // void Component::_init()
