@@ -1,0 +1,8 @@
+Import("env")
+Import("env_modules")
+
+module_env = env_modules.Clone()
+
+# Godot's own source files
+# module_env.Prepend(CPPPATH=['modules'])
+module_env.add_source_files(env.modules_sources, "*.cpp")
