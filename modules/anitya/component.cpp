@@ -34,6 +34,7 @@ void Component::set_entity(Node* p_entity)
 void Component::_bind_methods()
 {
     ClassDB::bind_method(D_METHOD("start"), &Component::start);
+    ClassDB::bind_method(D_METHOD("after_start"), &Component::after_start);
     ClassDB::bind_method(D_METHOD("apply_property"), &Component::apply_property);
     ClassDB::bind_method(D_METHOD("destroy"), &Component::destroy);
 

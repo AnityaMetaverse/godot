@@ -48,6 +48,7 @@ class Component: public Node
     
     public:
         virtual void start() {}
+        virtual void after_start() {}
         void set_uuid(const Ref<UUID>& p_uuid) { uuid = p_uuid; }
         Ref<UUID> get_uuid() const { return uuid; }
 
