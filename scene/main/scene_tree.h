@@ -117,8 +117,8 @@ private:
 	bool accept_quit;
 	bool quit_on_go_back;
 
-#ifdef DEBUG_ENABLED
 	bool debug_collisions_hint;
+#ifdef DEBUG_ENABLED
 	bool debug_navigation_hint;
 #endif
 	bool pause;
@@ -332,15 +332,13 @@ public:
 	void set_pause(bool p_enabled);
 	bool is_paused() const;
 
-#ifdef DEBUG_ENABLED
 	void set_debug_collisions_hint(bool p_enabled);
 	bool is_debugging_collisions_hint() const;
+#ifdef DEBUG_ENABLED
 
 	void set_debug_navigation_hint(bool p_enabled);
 	bool is_debugging_navigation_hint() const;
 #else
-	void set_debug_collisions_hint(bool p_enabled) {}
-	bool is_debugging_collisions_hint() const { return false; }
 
 	void set_debug_navigation_hint(bool p_enabled) {}
 	bool is_debugging_navigation_hint() const { return false; }

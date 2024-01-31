@@ -198,7 +198,7 @@ void CollisionObject::_update_pickable() {
 }
 
 bool CollisionObject::_are_collision_shapes_visible() {
-	return is_inside_tree() && get_tree()->is_debugging_collisions_hint() && !Engine::get_singleton()->is_editor_hint();
+	return is_inside_tree() && get_tree()->is_debugging_collisions_hint() && !Engine::get_singleton()->is_editor_hint() && !is_in_group("hide-collision");
 }
 
 void CollisionObject::_update_shape_data(uint32_t p_owner) {

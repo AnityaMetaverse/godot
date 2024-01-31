@@ -852,7 +852,6 @@ bool SceneTree::is_node_being_edited(const Node *p_node) const {
 }
 #endif
 
-#ifdef DEBUG_ENABLED
 void SceneTree::set_debug_collisions_hint(bool p_enabled) {
 	debug_collisions_hint = p_enabled;
 }
@@ -861,6 +860,7 @@ bool SceneTree::is_debugging_collisions_hint() const {
 	return debug_collisions_hint;
 }
 
+#ifdef DEBUG_ENABLED
 void SceneTree::set_debug_navigation_hint(bool p_enabled) {
 	debug_navigation_hint = p_enabled;
 }
@@ -2160,8 +2160,8 @@ SceneTree::SceneTree() {
 	quit_on_go_back = true;
 	initialized = false;
 	use_font_oversampling = false;
-#ifdef DEBUG_ENABLED
 	debug_collisions_hint = false;
+#ifdef DEBUG_ENABLED
 	debug_navigation_hint = false;
 #endif
 	debug_collisions_color = GLOBAL_DEF("debug/shapes/collision/shape_color", Color(0.0, 0.6, 0.7, 0.42));
