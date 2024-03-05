@@ -15,8 +15,13 @@ class _ALS: public Object
     
     public:
         static _ALS* get_singleton() { return _singleton; }
-        PoolByteArray to_audio_network_array(const PoolVector2Array& p_array, int sample_bytes_size) const;
-        PoolVector2Array to_vector2_array(const PoolByteArray& p_array, int sample_bytes_size) const;
+        PoolByteArray compress_from_vector2_array(const PoolVector2Array& p_array);
+        PoolVector2Array uncompress_to_vector2_array(const PoolByteArray& array);
+
+        static void _compress_from_vector2_array(uint8_t* destiny, const float* source, int samount, bool surround = true);
+        static void _uncompress_to_vector2_array(float* destiny, const uint8_t* source, int samount);
+
+        // int assemble_pack(const PoolByteArray& array);
         _ALS();
 
 };

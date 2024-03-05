@@ -15,10 +15,11 @@ class ALSPack: public Reference
         static void _bind_methods();
 
     public:
-        void pack_from_vector2_array(const PoolVector2Array& p_array);
-        PoolVector2Array unpack_to_vector2_array() const;
-        int assemble_pack(const PoolByteArray& array);
         PoolByteArray data() const { return _data; }
+        void resize(int package_size);
+        void assign_data(const PoolByteArray& data) { _data = data; }
+        // void parse_data(const )
+        ALSPack();
 };
 
 #endif
