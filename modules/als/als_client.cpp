@@ -22,16 +22,53 @@ void ALSClient::update()
                 PoolByteArray buffer;
                 Error err = _channel->get_packet_buffer(buffer);
                 const uint8_t* p = buffer.read().ptr();
-                // print_line(String("package size: " + itos(buffer.size())));
-                // print_line(String("package first value: " + itos(buffer[0])));
                 if ((*p & ALS_MESSAGE_TYPE_COMMAND) != 0)
                 {
                     switch ((*p) & ~(1 << 7))
                     {
-                    case ALS_COMMAND_ASSIGN_ID:
-                        print_line("[ANITYA] ID of user assigned.");
-                        _user_id = *(p + 1);
-                        break;
+                        case ALS_COMMAND_ASSIGN_ID:
+                            print_line("ALS_COMMAND_ASSIGN_ID");
+                            _user_id = *(p + 1);
+                            _send_user_created();
+                            _send_get_user_list();
+                            break;
+                        case ALS_COMMAND_USER_REGISTER:
+                        {
+                            print_line("ALS_COMMAND_USER_REGISTER");
+                            uint8_t remote_user_id = buffer[1];
+                            Ref<ALSUser> ru = memnew(ALSUser);
+                            ru->set_user_id(remote_user_id);
+                            _users[remote_user_id] = ru;
+                            emit_signal("user_added", ru);
+                            break;
+                        }
+                        case ALS_COMMAND_GET_USER_LIST:
+                            print_line("ALS_COMMAND_GET_USER_LIST");
+                            for (int index = 1; index < buffer.size(); index++)
+                            {
+                                int8_t uid = buffer[index];
+                                if (uid != _user_id)
+                                {
+                                    Ref<ALSUser> u = memnew(ALSUser);
+                                    u->set_user_id(uid);
+                                    // _users[buffer[index]] = u;
+                                    _users[buffer[index]] = u;
+                                    emit_signal("user_added", u);
+                                }
+                            }
+                            break;
+                        case ALS_COMMAND_REMOVE_USER:
+                        {
+                            print_line("ALS_COMMAND_REMOVE_USER");
+                            uint8_t user_id = buffer[1];
+                            Ref<ALSUser> u = _users.get(user_id, Ref<ALSUser>());
+                            if (u.is_valid())
+                            {
+                                emit_signal("user_removed", u);
+                            }
+                            _users.erase(user_id);
+                            break;
+                        }
                     }
                 }
                 else
@@ -41,11 +78,57 @@ void ALSClient::update()
                         PoolByteArray voice;
                         voice.resize(buffer.size() - 1);
                         memcpy(voice.write().ptr(), p + 1, buffer.size() - 1);
-                        emit_signal("data_received", voice);
+                        int8_t uid = buffer[0] & ~(1 << 7);
+                        Ref<ALSUser> u = _users.get(uid, Ref<ALSUser>());
+                        
+                        if (u.is_valid())
+                        {
+                            print_line("inserting voice package");
+                            print_error(itos(voice.size()));
+                            u->add_voice_package(voice);
+                        }
+                        else
+                        {
+                            print_line(String("Invalid user. UserId: ") + itos(uid));
+                        }
                     }
                 }
             }
         // }
+    }
+}
+
+void ALSClient::_send_user_created()
+{
+    if (_channel)
+    {
+        PoolByteArray command;
+        command.resize(2);
+        command.set(0, ALS_MESSAGE_TYPE_COMMAND | ALS_COMMAND_USER_REGISTER);
+        command.set(1, _user_id);
+
+        Error err = _channel->put_packet(command.read().ptr(), command.size());
+        if (err != OK)
+        {
+            print_error(String("Error sending command ALS_COMMAND_USER_REGISTER. Error code: ") + itos(err));
+        }
+    }
+}
+
+void ALSClient::_send_get_user_list()
+{
+    if (_channel)
+    {
+        // PoolByteArray command;
+        // command.resize(2);
+        // command.set(0, ALS_MESSAGE_TYPE_COMMAND | ALS_COMMAND_USER_REGISTER);
+        // command.set(1, _user_id);
+        uint8_t byte = ALS_MESSAGE_TYPE_COMMAND | ALS_COMMAND_GET_USER_LIST;
+        Error err = _channel->put_packet(&byte, 1);
+        if (err != OK)
+        {
+            print_error(String("Error sending command ALS_COMMAND_USER_REGISTER. Error code: ") + itos(err));
+        }
     }
 }
 
@@ -106,6 +189,8 @@ void ALSClient::_bind_methods()
     ClassDB::bind_method(D_METHOD("push_voice_from_vector2", "voice"), &ALSClient::push_voice_from_vector2);
     ClassDB::bind_method(D_METHOD("set_peer", "peer"), &ALSClient::set_peer);
     ADD_SIGNAL(MethodInfo("data_received", PropertyInfo(Variant::POOL_BYTE_ARRAY, "data")));
+    ADD_SIGNAL(MethodInfo("user_added", PropertyInfo(Variant::OBJECT, "user")));
+    ADD_SIGNAL(MethodInfo("user_removed", PropertyInfo(Variant::OBJECT, "user")));
 }
 
 ALSClient::ALSClient()

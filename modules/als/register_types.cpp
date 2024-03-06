@@ -5,7 +5,7 @@
 
 #include "als.h"
 #include "als_pack.h"
-// #include "als_user.h"
+#include "als_user.h"
 #include "als_client.h"
 
 
@@ -17,7 +17,7 @@ void register_als_types()
     ClassDB::register_class<_ALS>();
     ClassDB::register_class<ALSPack>();
     ClassDB::register_class<ALSClient>();
-    // ClassDB::register_class<ALSUser>();
+    ClassDB::register_class<ALSUser>();
 
     _als = memnew(_ALS);
     Engine::get_singleton()->add_singleton(Engine::Singleton("ALS", _ALS::get_singleton()));
