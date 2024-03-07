@@ -50,6 +50,7 @@ class ALSClient: public Object
         void push_voice(const PoolByteArray& array);
         void push_voice_from_vector2(const PoolVector2Array& array);
         int get_user_id() const { return _user_id; }
+        void clean();
     
     private:
         void _send_user_created();

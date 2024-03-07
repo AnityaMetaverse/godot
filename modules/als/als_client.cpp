@@ -83,7 +83,7 @@ void ALSClient::update()
                         
                         if (u.is_valid())
                         {
-                            print_line("inserting voice package");
+                            // print_line("inserting voice package");
                             print_error(itos(voice.size()));
                             u->add_voice_package(voice);
                         }
@@ -156,6 +156,17 @@ void ALSClient::push_voice(const PoolByteArray& array)
 
 }
 
+void ALSClient::clean()
+{
+    Array us = _users.keys();
+    for (int index = 0; index < us.size(); index++)
+    {
+        Ref<ALSUser> u = _users[us[index]];
+        emit_signal("user_removed", u);
+        _users.erase(us[index]);
+    }
+}
+
 void ALSClient::push_voice_from_vector2(const PoolVector2Array& array)
 {
 
@@ -188,6 +199,8 @@ void ALSClient::_bind_methods()
     ClassDB::bind_method(D_METHOD("push_voice", "voice"), &ALSClient::push_voice);
     ClassDB::bind_method(D_METHOD("push_voice_from_vector2", "voice"), &ALSClient::push_voice_from_vector2);
     ClassDB::bind_method(D_METHOD("set_peer", "peer"), &ALSClient::set_peer);
+    ClassDB::bind_method(D_METHOD("clean"), &ALSClient::clean);
+
     ADD_SIGNAL(MethodInfo("data_received", PropertyInfo(Variant::POOL_BYTE_ARRAY, "data")));
     ADD_SIGNAL(MethodInfo("user_added", PropertyInfo(Variant::OBJECT, "user")));
     ADD_SIGNAL(MethodInfo("user_removed", PropertyInfo(Variant::OBJECT, "user")));
